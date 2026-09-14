@@ -1,3 +1,4 @@
+# Corre scripts/fetch-monday.mjs cada 30 min y publica data/raw.json para index.html.
 name: Actualizar datos de monday.com
 
 on:
