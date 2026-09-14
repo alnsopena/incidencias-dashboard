@@ -2024,7 +2024,6 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
   "use strict";
 
   var mcp = null;
-  var dl = null;
   var lastModel = null;
   var lastRaw = null;
   var lastFetchedAtHora = null;
@@ -2497,10 +2496,6 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
     if (busy) return;
     if (opts.modo === "area" ? !(global.jspdf && global.PDFLib && global.BitacoraPlantilla) : !global.html2pdf) {
       showNotice(NOTICE.PDF_LOAD);
-      return;
-    }
-    if (!dl) {
-      showNotice(NOTICE.PDF_UNAVAILABLE);
       return;
     }
     if (!lastModel || !lastRaw) return;
