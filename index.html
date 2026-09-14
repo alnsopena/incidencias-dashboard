@@ -1,0 +1,2792 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found]){display:none!important}</style></head><body>
+<title>Incidencias &amp; Mejoras Go Live en vivo</title>
+<style>
+  :root {
+    --ground: #f5f7f8;
+    --surface: #ffffff;
+    --surface-sunken: #eef1f3;
+    --border: #dde3e7;
+    --ink: #16232c;
+    --ink-soft: #4c5c66;
+    --ink-faint: #7c8b93;
+    --accent: #1d5c74;
+    --accent-soft: #d7e6ea;
+    --accent-strong: #0f3d4f;
+    --crit: #c1443a;
+    --crit-bg: #fbe8e6;
+    --alta: #c97a2b;
+    --alta-bg: #fbedde;
+    --media: #2f8f86;
+    --media-bg: #e2f1ee;
+    --baja: #6b7f8c;
+    --baja-bg: #eaeef0;
+    --good: #2c8a5b;
+    --good-bg: #e3f2e9;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #10161b;
+      --surface: #172127;
+      --surface-sunken: #1c2830;
+      --border: #2a3941;
+      --ink: #e8edef;
+      --ink-soft: #aebbc1;
+      --ink-faint: #7c8b93;
+      --accent: #5fa9c2;
+      --accent-soft: #22333a;
+      --accent-strong: #8ec5d8;
+      --crit: #e2716a;
+      --crit-bg: #2e1c1c;
+      --alta: #dba05a;
+      --alta-bg: #2e2418;
+      --media: #5cbdb2;
+      --media-bg: #17302c;
+      --baja: #93a5b0;
+      --baja-bg: #202b31;
+      --good: #63be8f;
+      --good-bg: #16281f;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #10161b;
+    --surface: #172127;
+    --surface-sunken: #1c2830;
+    --border: #2a3941;
+    --ink: #e8edef;
+    --ink-soft: #aebbc1;
+    --ink-faint: #7c8b93;
+    --accent: #5fa9c2;
+    --accent-soft: #22333a;
+    --accent-strong: #8ec5d8;
+    --crit: #e2716a;
+    --crit-bg: #2e1c1c;
+    --alta: #dba05a;
+    --alta-bg: #2e2418;
+    --media: #5cbdb2;
+    --media-bg: #17302c;
+    --baja: #93a5b0;
+    --baja-bg: #202b31;
+    --good: #63be8f;
+    --good-bg: #16281f;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: Arial, "Segoe UI", -apple-system, "Helvetica Neue", sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 20px 22px 26px;
+  }
+
+  header.report {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    border-bottom: 2px solid var(--accent-strong);
+    padding-bottom: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .report-title {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--accent-strong);
+    margin: 0 0 3px;
+  }
+  .report-sub { color: var(--ink-soft); font-size: 12px; }
+  .report-sub a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+  .report-meta { text-align: right; font-size: 11px; color: var(--ink-faint); }
+  .report-meta .date { font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .report-block { margin-bottom: 12px; }
+  .report-block:last-child { margin-bottom: 0; }
+  .report-block-title {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent-strong);
+    margin: 0 0 3px;
+  }
+  .report-block-sub { font-size: 11px; color: var(--ink-faint); margin: 0 0 10px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 9px; margin-bottom: 11px; }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 10px 8px;
+    text-align: center;
+  }
+  .kpi .num { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--ink); }
+  .kpi .label { margin-top: 3px; font-size: 9.5px; color: var(--ink-soft); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+  .kpi.kpi-alert { background: var(--alta-bg); border-color: var(--alta); }
+  .kpi.kpi-alert .num, .kpi.kpi-alert .label { color: var(--alta); }
+  .kpi.k-cerrados { border-color: var(--good); }
+
+  .grid-2 { display: grid; grid-template-columns: 1.05fr 1fr; gap: 11px; margin-bottom: 10px; align-items: start; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 12px 14px; }
+  .panel h3 { margin: 0 0 9px; font-size: 12.5px; font-weight: 700; color: var(--ink); }
+  .panel h3 .n { color: var(--ink-faint); font-weight: 500; font-size: 10.5px; }
+
+  .bar-row { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { flex: 0 0 50px; font-size: 11px; color: var(--ink-soft); }
+  .bar-track { flex: 1; background: var(--surface-sunken); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .bar-val { flex: 0 0 18px; text-align: right; font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .estado-abierto .bar-fill { background: var(--crit); }
+  .estado-cosmos .bar-fill { background: var(--accent); }
+  .estado-pruebas .bar-fill { background: var(--media); }
+  .estado-reabierto .bar-fill { background: var(--alta); }
+  .estado-primera .bar-fill { background: var(--accent); }
+  .sev-critica .bar-fill { background: var(--crit); }
+  .sev-alta .bar-fill { background: var(--alta); }
+
+  .stat-row { margin-bottom: 8px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+  .stat-title { font-size: 11px; font-weight: 700; color: var(--ink); }
+  .stat-note { font-size: 9.5px; color: var(--ink-faint); text-align: right; }
+  .stat-line { display: flex; align-items: center; gap: 9px; }
+  .stat-line .bar-track { flex: 1; }
+  .stat-line .bar-val { flex: 0 0 18px; text-align: right; font-size: 11.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+  .area-breakdown { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+  .area-chip { font-size: 9.5px; font-weight: 600; color: var(--ink-soft); background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 2px 7px; }
+  .area-chip b { color: var(--ink); font-weight: 800; margin-left: 2px; }
+
+  .oldest-block { margin: 4px 0 8px 2px; padding-left: 9px; border-left: 2px solid var(--border); }
+  .oldest-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-faint); font-weight: 700; margin-bottom: 4px; }
+  .oldest-item { display: flex; gap: 7px; font-size: 10px; color: var(--ink-soft); margin-bottom: 3px; line-height: 1.35; }
+  .oldest-item:last-child { margin-bottom: 0; }
+  .oldest-date { flex: 0 0 54px; color: var(--ink-faint); font-variant-numeric: tabular-nums; font-size: 9.5px; padding-top: 1px; }
+
+  .estado-group { padding: 9px 11px; border-radius: 6px; background: var(--surface-sunken); margin-bottom: 10px; }
+  .estado-group:last-child { margin-bottom: 0; }
+  .estado-group-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+  .estado-group-title { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; }
+  .estado-group.group-baufest .estado-group-title { color: var(--accent-strong); }
+  .estado-group.group-cosmos .estado-group-title { color: var(--baja); }
+  .estado-group-total { font-size: 10.5px; font-weight: 800; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 2px 8px; }
+
+  .panel-note { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 9.5px; color: var(--ink-faint); }
+
+  table.moves { width: 100%; border-collapse: collapse; font-size: 10.5px; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+  table.moves th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-faint); font-weight: 700; padding: 6px 9px; background: var(--surface-sunken); border-bottom: 1px solid var(--border); }
+  table.moves td { padding: 5px 9px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.moves tr:last-child td { border-bottom: none; }
+  .id-cell { font-family: "SF Mono", Consolas, monospace; font-size: 10px; font-weight: 700; color: var(--accent-strong); white-space: nowrap; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 100px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+  .tag.mov-nuevo { background: var(--accent-soft); color: var(--accent-strong); }
+  .tag.mov-cerrado { background: var(--good-bg); color: var(--good); }
+  .tag.mov-retest { background: var(--media-bg); color: var(--media); }
+  .tag.mov-reabierto { background: var(--alta-bg); color: var(--alta); }
+  .tag.sev-Crítica { background: var(--crit-bg); color: var(--crit); }
+  .tag.sev-Alta { background: var(--alta-bg); color: var(--alta); }
+  .empty-row { padding: 7px 9px; color: var(--ink-faint); font-size: 10px; font-style: italic; }
+  .mov-time { display: block; margin-top: 3px; font-size: 8.7px; color: var(--ink-faint); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mov-time.hora-stale { color: var(--alta); font-weight: 700; }
+
+  .reason-label { display: block; margin-top: 4px; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-faint); }
+  .reason-list { margin: 3px 0 0; padding-left: 13px; font-size: 9.5px; color: var(--ink-soft); line-height: 1.4; }
+  .reason-list li { margin-bottom: 2px; }
+  .reason-list li:last-child { margin-bottom: 0; }
+
+  footer { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 9.5px; color: var(--ink-faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+  @page { size: A4; margin: 12mm 14mm; }
+  @media print {
+    body { background: var(--surface); }
+    .page { padding: 0; max-width: none; }
+    .kpi, .panel, table.moves { break-inside: avoid; }
+    .grid-2 .panel { break-inside: avoid; }
+    .kpi-row { break-inside: avoid; page-break-inside: avoid; }
+  }
+
+  @media screen and (max-width: 760px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    header.report { flex-direction: column; align-items: flex-start; }
+    .report-meta { text-align: left; }
+  }
+
+/* App chrome (toolbar/notice/loading) + the two severidad tokens missing from styles.css. Tokens only, no hardcoded colors. */
+.toolbar {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 10px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.toolbar .actions { display: flex; gap: 8px; }
+.toolbar button {
+  font: inherit;
+  font-weight: 700;
+  font-size: 11.5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.toolbar button:hover { border-color: var(--accent); color: var(--accent-strong); }
+.toolbar button:disabled { opacity: 0.55; cursor: default; }
+.toolbar button[hidden] { display: none; }
+
+#notice {
+  max-width: 980px;
+  margin: 10px auto 0;
+  padding: 9px 14px;
+  border-radius: 6px;
+  background: var(--alta-bg);
+  color: var(--alta);
+  border: 1px solid var(--alta);
+  font-size: 12px;
+}
+#notice[hidden] { display: none; }
+
+.loading-note { padding: 40px 0; text-align: center; color: var(--ink-faint); font-size: 12.5px; }
+
+@media print {
+  #toolbar, #notice { display: none; }
+}
+
+.sev-media .bar-fill { background: var(--media); }
+.sev-baja .bar-fill { background: var(--baja); }
+.tag.sev-Media { background: var(--media-bg); color: var(--media); }
+.tag.sev-Baja { background: var(--baja-bg); color: var(--baja); }
+
+/* --- Incidencias & Mejoras Go Live additions --- */
+.kpi-row.six { grid-template-columns: repeat(6, 1fr); }
+@media screen and (max-width: 760px) {
+  .kpi-row.six, .kpi-row.four { grid-template-columns: repeat(2, 1fr); }
+}
+
+.dl-note { margin: -4px 0 11px; font-size: 10.5px; color: var(--ink-faint); }
+
+.sev-chips { display: flex; gap: 6px; margin: 4px 0 2px 59px; font-size: 9.5px; font-weight: 700; color: var(--ink-soft); }
+
+.id-cell a { color: inherit; text-decoration: none; }
+
+.tag.mov-revisado { background: var(--accent-soft); color: var(--accent-strong); }
+
+.tag.gl-bloq { background: var(--crit-bg); color: var(--crit); }
+.tag.gl-nobloq { background: var(--baja-bg); color: var(--baja); }
+.tag.gl-dl { background: var(--media-bg); color: var(--media); }
+.tag.gl-none { background: var(--baja-bg); color: var(--baja); }
+
+/* --- Handover inventory view --- */
+.kpi.k-main { border-color: var(--accent); background: var(--accent-soft); }
+.kpi.k-main .num, .kpi.k-main .label { color: var(--accent-strong); }
+.kpi.k-muted .num { color: var(--ink-soft); }
+
+.lead-note { margin: 0 0 11px; padding: 9px 12px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 6px 6px 0; font-size: 12px; color: var(--ink); }
+
+.bar-track.stack { display: flex; }
+.bar-track.stack .seg { height: 100%; }
+.seg-bloq { background: var(--crit); }
+.seg-nobloq { background: var(--baja); }
+.seg-none { background: var(--alta); }
+.legend { display: flex; gap: 12px; margin: -3px 0 9px; font-size: 9.5px; color: var(--ink-soft); }
+.legend .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.bar-row.cmp { margin-bottom: 7px; }
+.bar-row.cmp .bar-label { flex: 0 0 132px; font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-row.cmp .bar-val { flex-basis: 26px; }
+.bar-row.cmp .bar-sub { flex: 0 0 46px; font-size: 9.5px; font-weight: 700; color: var(--crit); text-align: right; white-space: nowrap; }
+.panel h3.sub-h { margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--border); }
+.stat-line .bar-val { flex-basis: 24px; }
+
+table.matrix { width: 100%; border-collapse: collapse; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+table.matrix th { font-size: 9px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-faint); font-weight: 700; padding: 5px 6px; text-align: center; border-bottom: 1px solid var(--border); }
+table.matrix td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--border); font-weight: 700; color: var(--ink); }
+table.matrix .row-h { text-align: left; }
+table.matrix td.zero { color: var(--ink-faint); font-weight: 400; }
+table.matrix td.hot { background: var(--crit-bg); color: var(--crit); }
+table.matrix td.warm { background: var(--alta-bg); color: var(--alta); }
+table.matrix td.tot { background: var(--surface-sunken); }
+table.matrix tr.total td { background: var(--surface-sunken); border-bottom: none; }
+
+.inv-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; font-size: 11px; color: var(--ink-soft); }
+.inv-filters label { display: flex; align-items: center; gap: 5px; font-weight: 700; }
+.inv-filters label.grow { flex: 1; min-width: 160px; }
+.inv-filters select, .inv-filters input { font: inherit; font-weight: 400; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 4px 6px; }
+.inv-filters input { flex: 1; min-width: 0; }
+#inv-shown { margin-left: auto; font-weight: 700; color: var(--ink); }
+
+.inv-section { margin-bottom: 14px; }
+.inv-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 0 0 6px; font-size: 13px; font-weight: 800; color: var(--ink); }
+.inv-count { font-size: 10.5px; font-weight: 800; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 1px 8px; }
+.inv-nota { font-size: 10px; font-weight: 400; color: var(--ink-faint); }
+.sec-bloq .inv-title { color: var(--crit); }
+.sec-retest .inv-title, .sec-dl .inv-title { color: var(--ink-soft); }
+table.moves.inv { background: var(--surface); }
+table.moves .rel { display: block; margin-top: 2px; font-size: 9px; color: var(--ink-faint); }
+.tag.gl-stack { display: block; width: max-content; margin-top: 3px; }
+td.et { font-size: 10px; color: var(--ink-soft); }
+td.et-reab { color: var(--alta); font-weight: 700; }
+td.num-cell { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.resumen-hoy { margin: 0 0 8px; font-size: 11.5px; color: var(--ink-soft); }
+@media print { .inv-filters { display: none; } }
+
+/* --- PDF options panel --- */
+.pdf-panel { max-width: 980px; margin: 0 auto; padding: 12px 22px 14px; background: var(--surface); border-bottom: 1px solid var(--border); font-size: 12px; color: var(--ink); }
+.pdf-panel .pdf-modes { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 10px; }
+.pdf-panel label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.pdf-panel .pdf-hint { color: var(--ink-faint); font-size: 11px; }
+.pdf-areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 14px; padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-sunken); margin-bottom: 10px; }
+.pdf-areas.disabled { opacity: 0.5; }
+.pdf-areas .area-n { color: var(--ink-faint); font-size: 10.5px; }
+.pdf-panel .pdf-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.pdf-panel .pdf-row .links button { font: inherit; font-size: 11px; background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; }
+.pdf-panel .pdf-actions { margin-left: auto; display: flex; gap: 8px; }
+.pdf-panel .pdf-actions button { font: inherit; font-weight: 700; font-size: 11.5px; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+.pdf-panel .pdf-actions button.primary { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--surface); }
+.pdf-panel .pdf-actions button:disabled { opacity: 0.5; cursor: default; }
+
+.eyebrow { margin: 0 0 4px; font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+
+/* --- PDF panel: review options + message --- */
+.pdf-extra { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0 0 10px; font-size: 11.5px; }
+.pdf-extra input, .pdf-extra select { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 3px 6px; }
+.pdf-msg { margin: 0 0 10px; }
+.pdf-msg .pdf-msg-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font-size: 11px; font-weight: 700; color: var(--ink-soft); }
+.pdf-msg textarea { width: 100%; min-height: 150px; font: inherit; font-size: 11.5px; line-height: 1.45; color: var(--ink); background: var(--surface-sunken); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; resize: vertical; }
+.pdf-msg button { font: inherit; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--ink); cursor: pointer; }
+.kpi-row.four { grid-template-columns: repeat(4, 1fr); }
+.tag.reab-tag { display: block; width: max-content; margin-top: 3px; background: var(--alta-bg); color: var(--alta); }
+@media screen and (max-width: 760px) {
+  table.moves.inv th:nth-child(3), table.moves.inv td:nth-child(3) { display: none; }
+}
+
+[hidden] { display: none !important; }
+
+tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; background: var(--surface) !important; font-size: 13px; font-weight: 800; color: var(--ink-soft); }
+
+/* PDF render always uses the desktop layout, whatever the viewer's screen width (see app.js pdfBlobFrom). */
+@media screen and (max-width: 760px) {
+  .pdf-desktop .kpi-row { grid-template-columns: repeat(5, 1fr); }
+  .pdf-desktop .kpi-row.six { grid-template-columns: repeat(6, 1fr); }
+  .pdf-desktop .kpi-row.four { grid-template-columns: repeat(4, 1fr); }
+  .pdf-desktop .grid-2 { grid-template-columns: 1.05fr 1fr; }
+  .pdf-desktop header.report { flex-direction: row; align-items: flex-end; }
+  .pdf-desktop .report-meta { text-align: right; }
+  .pdf-desktop table.moves.inv th:nth-child(3), .pdf-desktop table.moves.inv td:nth-child(3) { display: table-cell; }
+}
+
+.pdf-ger input[type=text] { min-width: 240px; }
+
+</style>
+<div class="toolbar" id="toolbar"><span id="status">Cargando datos de monday.com…</span><span class="actions"><button id="btn-refresh" type="button">Actualizar</button><button id="btn-pdf" type="button" hidden>Descargar PDF</button></span></div>
+<div class="pdf-panel" id="pdf-panel" hidden></div>
+<div id="notice" hidden></div>
+<div id="report"><p class="loading-note">Cargando reporte…</p></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.3/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+/* IncidenciasEngine — pure computation of the Incidencias & Mejoras Go Live report model. IIFE, ES2019. */
+(function (global) {
+  "use strict";
+
+  var MESES_CORTOS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  var MESES_LARGOS = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+    "septiembre", "octubre", "noviembre", "diciembre"];
+  var STRIP_TAGS = { "BAUFEST": true };
+  var CODE_RE = /^(H|D|UAT-E2E|PECMO\d*)-?\d+/;
+  var SEV_ORDER = ["Crítica", "Alta", "Media", "Baja"];
+  var SEV_ABBR = { "Crítica": "C", "Alta": "A", "Media": "M", "Baja": "B" };
+
+  // ---- Lima time (UTC-5, fixed, no DST) — same helpers as the reference (_ref_engine_defectos.js) ----
+  function ticksToMs(s) {
+    return Number(String(s).slice(0, -4));
+  }
+
+  function limaDate(ms) {
+    return new Date(ms - 5 * 3600e3).toISOString().slice(0, 10);
+  }
+
+  function limaParts(ms) {
+    var d = new Date(ms - 5 * 3600e3);
+    return { h: d.getUTCHours(), m: d.getUTCMinutes() };
+  }
+
+  function fmtHora(ms) {
+    var p = limaParts(ms);
+    var ampm = p.h < 12 ? "am" : "pm";
+    var h12 = p.h % 12;
+    if (h12 === 0) h12 = 12;
+    var mm = p.m < 10 ? "0" + p.m : String(p.m);
+    return h12 + ":" + mm + " " + ampm;
+  }
+
+  function parseYMD(s) {
+    var parts = String(s).split("-");
+    return { y: Number(parts[0]), m: Number(parts[1]), d: Number(parts[2]) };
+  }
+
+  function fmtCorta(ymd) {
+    var p = parseYMD(ymd);
+    return p.d + " " + MESES_CORTOS[p.m - 1];
+  }
+
+  function fmtMedia(ymd) {
+    var p = parseYMD(ymd);
+    return p.d + " " + MESES_CORTOS[p.m - 1] + " " + p.y;
+  }
+
+  function fmtLarga(ymd) {
+    var p = parseYMD(ymd);
+    return p.d + " de " + MESES_LARGOS[p.m - 1] + ", " + p.y;
+  }
+
+  function diasEntre(a, b) {
+    var pa = parseYMD(a), pb = parseYMD(b);
+    var ma = Date.UTC(pa.y, pa.m - 1, pa.d);
+    var mb = Date.UTC(pb.y, pb.m - 1, pb.d);
+    return Math.round((mb - ma) / 86400000);
+  }
+
+  // ---- title cleanup ----
+  function collapseSpaces(s) {
+    return String(s).replace(/\s+/g, " ").trim();
+  }
+
+  function isAllCaps(s) {
+    return /[A-ZÁÉÍÓÚÑÜ]/.test(s) && s === s.toUpperCase() && s !== s.toLowerCase();
+  }
+
+  function sentenceCase(s) {
+    if (!s) return s;
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  }
+
+  function codeOf(name, id) {
+    var m = String(name).match(/\[([^\[\]]+)\]/);
+    if (m) {
+      var content = m[1].trim();
+      if (CODE_RE.test(content)) return { code: content, bracketContent: content };
+    }
+    var idStr = String(id);
+    var last5 = idStr.length > 5 ? idStr.slice(-5) : idStr;
+    return { code: "#" + last5, bracketContent: null };
+  }
+
+  function cleanTitle(name, codeBracketContent, sinCortar) {
+    // [BLOQUEANTE]/[NO BLOQUEANTE] tags anywhere repeat the Estado Go Live column — drop them
+    var s = collapseSpaces(String(name).replace(/\[\s*(NO\s+)?BLOQUEANTE\s*\]\s*,?\s*/gi, ""));
+    // strip leading [TAG] groups: BAUFEST, and the code token itself (already shown in the ID column)
+    while (true) {
+      var m = s.match(/^\[([^\[\]]+)\]/);
+      if (!m) break;
+      var content = m[1].trim();
+      var upper = content.toUpperCase();
+      var isCodeToken = codeBracketContent != null && content === codeBracketContent;
+      if (!STRIP_TAGS[upper] && !isCodeToken) break;
+      s = s.slice(m[0].length).replace(/^[\s,]+/, "");
+    }
+    var prefix = null, rest = s;
+    var m2 = s.match(/^\[([^\[\]]+)\]/);
+    if (m2) {
+      var x = m2[1].trim();
+      if (isAllCaps(x)) x = sentenceCase(x);
+      prefix = x;
+      rest = s.slice(m2[0].length).replace(/^\s+/, "");
+    }
+    var out;
+    if (prefix !== null) {
+      var hasColon = rest.slice(0, 40).indexOf(":") !== -1;
+      out = hasColon ? (prefix + ". " + rest) : (prefix + ": " + rest);
+    } else {
+      out = rest;
+    }
+    out = collapseSpaces(out);
+    if (out.length) out = out.charAt(0).toUpperCase() + out.slice(1);
+    if (out.charAt(out.length - 1) === ".") out = out.slice(0, -1);
+    if (!sinCortar && out.length > 110) {
+      var cut = out.slice(0, 110);
+      var idx = cut.lastIndexOf(" ");
+      if (idx > -1) cut = cut.slice(0, idx);
+      cut = cut.replace(/[,;:—\-\s]+$/, "");
+      out = cut + "…";
+    }
+    return out;
+  }
+
+  // ---- column value helpers ----
+  function cv(item, col) {
+    var v = item.column_values && item.column_values[col];
+    return v === undefined ? null : v;
+  }
+  function glRawOf(it) { return cv(it, "color_mm654b11"); }
+  function areaOf(it) { return cv(it, "dropdown_mm38x45a"); }
+  function sevOf(it) { return cv(it, "color_mm08qtw9"); }
+  function reporteOf(it) { return cv(it, "date_mm0dgr9k"); }
+  function revisionOf(it) { return cv(it, "date_mm151q1k"); }
+  function retestOf(it) { return cv(it, "date_mm0dfxgk"); }
+  function cierreOf(it) { return cv(it, "date_mm0d57hz"); }
+  function reaperturaOf(it) { return cv(it, "date_mm1q65r7"); }
+  function etapaOf(it) { return cv(it, "color_mm73ye9b"); }
+
+  function relOf(it) { return cv(it, "text_mm6w60e0"); }
+  function tipoOf(it) {
+    var g = it.group || {};
+    if (g.id === "group_mm6618d8" || /mejora/i.test(g.title || "")) return "Mejora";
+    return "Incidencia";
+  }
+
+  function isDataLake(it) { return glRawOf(it) === "Data Lake"; }
+  function isBloqueante(it) { return glRawOf(it) === "Bloqueante"; }
+  function glDisplay(raw) {
+    if (raw == null) return "Sin clasificar";
+    if (raw === "No Bloquenate") return "No bloqueante"; // sic — typo in monday.com
+    return raw;
+  }
+  function glClass(raw) {
+    if (raw === "Bloqueante") return "gl-bloq";
+    if (raw === "Data Lake") return "gl-dl";
+    if (raw == null) return "gl-none";
+    return "gl-nobloq"; // "No bloqueante" / "No Bloquenate"
+  }
+
+  // ---- stage: the board's "Etapa" status column (Reportado / En revisión / Ejecutar pruebas / Cerrado) ----
+  var ETAPAS = ["Reportado", "En revisión", "Ejecutar pruebas", "Cerrado"];
+  function stageOf(it) {
+    var et = etapaOf(it);
+    return ETAPAS.indexOf(et) !== -1 ? et : "Sin etapa";
+  }
+  // Reopened marker (not a stage): Reapertura date set after the last retest release.
+  function reabiertoOf(it) {
+    var rea = reaperturaOf(it), ret = retestOf(it);
+    return rea != null && (ret == null || rea > ret);
+  }
+  function isOpen(stage) { return stage !== "Cerrado"; }
+  function responsableOf(stage) {
+    if (stage === "Reportado" || stage === "En revisión" || stage === "Sin etapa") return "Desarrollo";
+    if (stage === "Ejecutar pruebas") return "Cosmos";
+    return null;
+  }
+
+  // ---- activity (only used to get the HOUR of today's set-events) ----
+  function parseActivity(activityObj) {
+    var byPulse = {};
+    if (!activityObj || !activityObj.data) return byPulse;
+    var list = [];
+    for (var i = 0; i < activityObj.data.length; i++) {
+      var e = activityObj.data[i];
+      var d;
+      try { d = JSON.parse(e.data); } catch (err) { continue; }
+      list.push({ ms: ticksToMs(e.created_at), event: e.event, d: d });
+    }
+    list.sort(function (a, b) { return a.ms - b.ms; });
+    for (var j = 0; j < list.length; j++) {
+      var ev = list[j];
+      var pid = ev.d && ev.d.pulse_id;
+      if (pid === undefined || pid === null) continue;
+      pid = Number(pid);
+      if (!byPulse[pid]) byPulse[pid] = [];
+      byPulse[pid].push(ev);
+    }
+    return byPulse;
+  }
+
+  function lastSetEventHora(evs, colId, hoy) {
+    var found = null;
+    if (!evs) return null;
+    for (var i = 0; i < evs.length; i++) {
+      var ev = evs[i];
+      if (ev.event !== "update_column_value" || ev.d.column_id !== colId) continue;
+      var val = ev.d.value;
+      if (val && val.date === hoy) found = ev;
+    }
+    if (!found) return null;
+    var ms = found.d.value.changed_at ? Date.parse(found.d.value.changed_at) : found.ms;
+    return fmtHora(ms);
+  }
+
+  // ---- helpers for the handover (inventory) view ----
+  var GL_ORDER = ["bloq", "nobloq", "none"];
+  var GL_LABEL = { bloq: "Bloqueante", nobloq: "No bloqueante", none: "Sin clasificar" };
+  var STAGE_ORDER = ["Reportado", "En revisión", "Sin etapa", "Ejecutar pruebas"];
+  var AGE_BUCKETS = [
+    { label: "0 a 7 días", min: 0, max: 7 },
+    { label: "8 a 30 días", min: 8, max: 30 },
+    { label: "31 a 60 días", min: 31, max: 60 },
+    { label: "Más de 60 días", min: 61, max: Infinity }
+  ];
+
+  function glKey(raw) {
+    if (raw === "Bloqueante") return "bloq";
+    if (raw === "Data Lake") return "dl";
+    if (raw == null) return "none";
+    return "nobloq";
+  }
+
+  function pct1(x) { return Math.round(x * 1000) / 10; }
+
+  function split(arr) {
+    var r = { n: arr.length, bloq: 0, nobloq: 0, none: 0 };
+    arr.forEach(function (e) { r[e.glk === "bloq" ? "bloq" : (e.glk === "none" ? "none" : "nobloq")]++; });
+    return r;
+  }
+
+  function addWidths(rows) {
+    var max = rows.reduce(function (m, r) { return Math.max(m, r.n); }, 0);
+    rows.forEach(function (r) {
+      r.wB = max > 0 ? pct1(r.bloq / max) : 0;
+      r.wN = max > 0 ? pct1(r.nobloq / max) : 0;
+      r.wX = max > 0 ? pct1(r.none / max) : 0;
+    });
+    return rows;
+  }
+
+  function sevRank(s) {
+    var i = SEV_ORDER.indexOf(s);
+    return i === -1 ? SEV_ORDER.length : i;
+  }
+
+  function invRow(e, hoy) {
+    var it = e.it;
+    var ci = codeOf(it.name, it.id);
+    var rep = reporteOf(it);
+    return {
+      code: ci.code, url: it.url, desc: cleanTitle(it.name, ci.bracketContent),
+      descCompleta: cleanTitle(it.name, ci.bracketContent, true),
+      rel: relOf(it) ? collapseSpaces(relOf(it)) : null,
+      tipo: e.tipo, area: e.area || "Sin área", areas: areaTokens(e.area), sev: e.sev || "—", etapa: e.stage,
+      reab: e.reab,
+      dias: rep != null ? diasEntre(rep, hoy) : null,
+      gl: glDisplay(e.glRaw), glClase: glClass(e.glRaw)
+    };
+  }
+
+  function sortInv(rows) {
+    rows.sort(function (a, b) {
+      var s = sevRank(a.sev) - sevRank(b.sev);
+      if (s) return s;
+      var da = a.dias == null ? -1 : a.dias, db = b.dias == null ? -1 : b.dias;
+      if (da !== db) return db - da;
+      return a.code < b.code ? -1 : (a.code > b.code ? 1 : 0);
+    });
+    return rows;
+  }
+
+  function uniqSorted(arr) {
+    var seen = {};
+    arr.forEach(function (v) { seen[v] = true; });
+    return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, "es"); });
+  }
+
+  // Área is a multi-value dropdown ("DOCUMENTACION, TI") and some labels combine two areas
+  // ("DOCUMENTACION / OPERACIONES"): a ticket belongs to every area it names.
+  function areaTokens(area) {
+    if (area == null || !String(area).trim()) return ["Sin área"];
+    return String(area).split(/\s*[,\/]\s*/).filter(function (t) { return t; });
+  }
+
+  function listaAreas(areas) {
+    if (areas.length === 1) return areas[0];
+    return areas.slice(0, -1).join(", ") + " y " + areas[areas.length - 1];
+  }
+
+  // opts.areas (optional): keep only tickets tagged with at least one of these areas (validation PDF).
+  function compute(raw, opts) {
+    opts = opts || {};
+    var now = raw.now;
+    var hoy = limaDate(now);
+    var areasSel = opts.areas && opts.areas.length ? opts.areas.slice() : null;
+    var items = (raw.items || []).filter(function (it) {
+      if (!areasSel) return true;
+      return areaTokens(areaOf(it)).some(function (t) { return areasSel.indexOf(t) !== -1; });
+    });
+    var boardName = raw.boardName || "";
+    var actToday = parseActivity(raw.activityToday);
+
+    var enriched = items.map(function (it) {
+      var stage = stageOf(it);
+      var glRaw = glRawOf(it);
+      var rep = reporteOf(it);
+      return {
+        it: it,
+        stage: stage,
+        open: isOpen(stage),
+        dl: isDataLake(it),
+        bloq: isBloqueante(it),
+        glRaw: glRaw,
+        glk: glKey(glRaw),
+        area: areaOf(it),
+        sev: sevOf(it),
+        tipo: tipoOf(it),
+        reab: reabiertoOf(it),
+        dias: rep != null ? diasEntre(rep, hoy) : null
+      };
+    });
+
+    // "Por atender" = open, not Data Lake, still on the vendor's side (Etapa Reportado / En revisión / empty).
+    // "Ejecutar pruebas" is on Cosmos' side: listed apart, not added to the total.
+    var openNonDL = enriched.filter(function (e) { return e.open && !e.dl; });
+    var porAtender = openNonDL.filter(function (e) { return responsableOf(e.stage) === "Desarrollo"; });
+    var enRetest = openNonDL.filter(function (e) { return e.stage === "Ejecutar pruebas"; });
+    var dlOpen = enriched.filter(function (e) { return e.open && e.dl; });
+
+    var tot = split(porAtender);
+    var criticos = porAtender.filter(function (e) { return e.sev === "Crítica"; }).length;
+    var kpis = {
+      porAtender: tot.n, bloqueantes: tot.bloq, noBloqueantes: tot.nobloq, sinClasificar: tot.none,
+      criticos: criticos, retest: enRetest.length, dataLake: dlOpen.length
+    };
+
+    // ---- Matriz de prioridad: Estado Go Live x Severidad (por atender) ----
+    var sevCols = SEV_ORDER.slice();
+    if (porAtender.some(function (e) { return sevRank(e.sev) === SEV_ORDER.length; })) sevCols.push("Sin severidad");
+    function colOf(e) { return sevRank(e.sev) === SEV_ORDER.length ? "Sin severidad" : e.sev; }
+    var matrizFilas = GL_ORDER.filter(function (k) { return k !== "none" || tot.none > 0; }).map(function (k) {
+      var arr = porAtender.filter(function (e) { return e.glk === k; });
+      return {
+        key: k, gl: GL_LABEL[k], glClase: k === "bloq" ? "gl-bloq" : (k === "none" ? "gl-none" : "gl-nobloq"),
+        cells: sevCols.map(function (c) { return arr.filter(function (e) { return colOf(e) === c; }).length; }),
+        total: arr.length
+      };
+    });
+    var matriz = {
+      cols: sevCols,
+      filas: matrizFilas,
+      totales: sevCols.map(function (c) { return porAtender.filter(function (e) { return colOf(e) === c; }).length; }),
+      total: tot.n
+    };
+
+    // ---- En qué etapa están (stage x Estado Go Live) ----
+    var etapaFilas = addWidths(STAGE_ORDER.map(function (st) {
+      var r = split(openNonDL.filter(function (e) { return e.stage === st; }));
+      r.etapa = st;
+      r.label = st === "Reportado" ? "Reportado (sin revisar)" : (st === "Sin etapa" ? "Sin etapa en monday" : st);
+      return r;
+    }));
+    var etapas = {
+      baufest: etapaFilas.slice(0, 3).filter(function (r) { return r.etapa !== "Sin etapa" || r.n > 0; }),
+      retest: etapaFilas[3],
+      reabiertos: porAtender.filter(function (e) { return e.reab; }).length
+    };
+
+    // ---- Por área (por atender) ----
+    var areaMap = {};
+    porAtender.forEach(function (e) {
+      var a = e.area || "Sin área";
+      (areaMap[a] = areaMap[a] || []).push(e);
+    });
+    var areas = addWidths(Object.keys(areaMap).map(function (a) {
+      var r = split(areaMap[a]);
+      r.area = a;
+      return r;
+    }));
+    areas.sort(function (a, b) {
+      if (b.n !== a.n) return b.n - a.n;
+      if (b.bloq !== a.bloq) return b.bloq - a.bloq;
+      return a.area.localeCompare(b.area, "es");
+    });
+
+    // ---- Antigüedad desde Fecha de reporte (por atender) ----
+    var antiguedad = AGE_BUCKETS.map(function (bk) {
+      var r = split(porAtender.filter(function (e) { return e.dias != null && e.dias >= bk.min && e.dias <= bk.max; }));
+      r.label = bk.label;
+      return r;
+    });
+    var sinFecha = porAtender.filter(function (e) { return e.dias == null; });
+    if (sinFecha.length) {
+      var rs = split(sinFecha);
+      rs.label = "Sin fecha de reporte";
+      antiguedad.push(rs);
+    }
+    addWidths(antiguedad);
+
+    // ---- Por tipo (grupos del tablero) ----
+    var tipos = addWidths(["Incidencia", "Mejora"].map(function (t) {
+      var r = split(porAtender.filter(function (e) { return e.tipo === t; }));
+      r.label = t === "Incidencia" ? "Incidencias" : "Mejoras";
+      return r;
+    }));
+
+    // ---- Inventario completo ----
+    function rowsOf(arr) { return sortInv(arr.map(function (e) { return invRow(e, hoy); })); }
+    var inventario = [
+      { key: "bloq", titulo: "Bloqueantes", nota: "Impiden el Go Live: atender primero.",
+        filas: rowsOf(porAtender.filter(function (e) { return e.glk === "bloq"; })) },
+      { key: "nobloq", titulo: "No bloqueantes", nota: "No detienen el Go Live.",
+        filas: rowsOf(porAtender.filter(function (e) { return e.glk === "nobloq"; })) }
+    ];
+    if (tot.none > 0) {
+      inventario.push({ key: "none", titulo: "Sin clasificar", nota: "Falta definir el Estado Go Live.",
+        filas: rowsOf(porAtender.filter(function (e) { return e.glk === "none"; })) });
+    }
+    if (enRetest.length) {
+      inventario.push({ key: "retest", titulo: "Ejecutar pruebas (Cosmos)",
+        nota: "Fuera del total por atender: vuelven a desarrollo si las pruebas fallan.", conGl: true,
+        filas: rowsOf(enRetest) });
+    }
+    if (dlOpen.length) {
+      inventario.push({ key: "dl", titulo: "Data Lake", nota: "Frente aparte, fuera de los indicadores de Go Live.",
+        conGl: true, filas: rowsOf(dlOpen) });
+    }
+    var todas = [];
+    inventario.forEach(function (s) { todas = todas.concat(s.filas); });
+    var filtros = {
+      areas: uniqSorted([].concat.apply([], todas.map(function (r) { return r.areas; }))),
+      etapas: STAGE_ORDER.filter(function (st) { return todas.some(function (r) { return r.etapa === st; }); }),
+      tipos: uniqSorted(todas.map(function (r) { return r.tipo; }))
+    };
+
+    // ---- Resumen (lead paragraph) ----
+    var mas30 = porAtender.filter(function (e) { return e.dias != null && e.dias > 30; }).length;
+    var partes = [tot.bloq + (tot.bloq === 1 ? " bloqueante" : " bloqueantes") + " (" + porAtender.filter(function (e) {
+      return e.glk === "bloq" && e.sev === "Crítica"; }).length + " críticos)"];
+    partes.push(tot.nobloq + (tot.nobloq === 1 ? " no bloqueante" : " no bloqueantes"));
+    if (tot.none) partes.push(tot.none + " sin clasificar");
+    var ultima = partes.pop();
+    var resumen = [];
+    var sujeto = areasSel ? (listaAreas(areasSel) + (areasSel.length === 1 ? " tiene " : " tienen ")) : "Hay ";
+    resumen.push(sujeto + tot.n + (tot.n === 1 ? " ticket" : " tickets") + " por atender: " +
+      (partes.length ? partes.join(", ") + " y " : "") + ultima + ".");
+    if (tot.n > 0) resumen.push(Math.round((mas30 / tot.n) * 100) + "% lleva más de 30 días esperando solución.");
+    if (etapas.reabiertos) resumen.push(etapas.reabiertos + (etapas.reabiertos === 1 ? " fue reabierto." : " fueron reabiertos."));
+    if (enRetest.length) resumen.push("Otros " + enRetest.length + " están en «Ejecutar pruebas» con Cosmos y vuelven a desarrollo si las pruebas fallan.");
+    if (dlOpen.length) resumen.push("Data Lake suma " + dlOpen.length + " aparte.");
+
+    // ---- Movements today (ALL items incl. Data Lake) ----
+    var movRaw = [];
+    var TYPE_ORDER = { cerrado: 0, reabierto: 1, retest: 2, revisado: 3, nuevo: 4 };
+    enriched.forEach(function (e) {
+      var it = e.it;
+      var cie = cierreOf(it), rea = reaperturaOf(it), ret = retestOf(it), rev = revisionOf(it);
+      var tipo = null, colId = null;
+      if (cie === hoy) { tipo = "cerrado"; colId = "date_mm0d57hz"; }
+      else if (rea === hoy) { tipo = "reabierto"; colId = "date_mm1q65r7"; }
+      else if (ret === hoy) { tipo = "retest"; colId = "date_mm0dfxgk"; }
+      else if (rev === hoy) { tipo = "revisado"; colId = "date_mm151q1k"; }
+      else if (limaDate(Date.parse(it.created_at)) === hoy) { tipo = "nuevo"; }
+
+      if (tipo === null) return;
+
+      var hora, ms;
+      if (tipo === "nuevo") {
+        ms = Date.parse(it.created_at);
+        hora = fmtHora(ms);
+      } else {
+        var evs = actToday[Number(it.id)] || [];
+        var found = null;
+        for (var i = 0; i < evs.length; i++) {
+          var ev = evs[i];
+          if (ev.event === "update_column_value" && ev.d.column_id === colId && ev.d.value && ev.d.value.date === hoy) found = ev;
+        }
+        if (found) {
+          ms = found.d.value.changed_at ? Date.parse(found.d.value.changed_at) : found.ms;
+          hora = fmtHora(ms);
+        } else {
+          ms = -1;
+          hora = "—";
+        }
+      }
+
+      var ci = codeOf(it.name, it.id);
+      movRaw.push({
+        tipo: tipo, code: ci.code, url: it.url, hora: hora, ms: ms,
+        desc: cleanTitle(it.name, ci.bracketContent),
+        area: e.area || "Sin área", sev: e.sev, gl: glDisplay(e.glRaw), glClase: glClass(e.glRaw),
+        dl: e.dl, order: TYPE_ORDER[tipo]
+      });
+    });
+    movRaw.sort(function (a, b) {
+      if (a.order !== b.order) return a.order - b.order;
+      return a.ms - b.ms;
+    });
+
+    var movimientos;
+    if (!movRaw.length) {
+      movimientos = [{ tipo: "vacio", texto: "Sin movimientos hoy." }];
+    } else {
+      movimientos = movRaw.map(function (r) {
+        return { tipo: r.tipo, code: r.code, url: r.url, hora: r.hora, desc: r.desc, area: r.area, sev: r.sev, gl: r.gl, glClase: r.glClase };
+      });
+    }
+
+    function countType(t) { return movRaw.filter(function (r) { return r.tipo === t; }).length; }
+    var nuevosHoy = countType("nuevo"), revisadosHoy = countType("revisado"), retestHoy = countType("retest");
+    var reabiertosHoy = countType("reabierto"), cerradosHoy = countType("cerrado");
+    var clauses = [];
+    if (nuevosHoy) clauses.push(nuevosHoy + (nuevosHoy === 1 ? " nuevo" : " nuevos"));
+    if (revisadosHoy) clauses.push(revisadosHoy + (revisadosHoy === 1 ? " revisado" : " revisados"));
+    if (retestHoy) clauses.push(retestHoy + " a retest");
+    if (reabiertosHoy) clauses.push(reabiertosHoy + (reabiertosHoy === 1 ? " reabierto" : " reabiertos"));
+    if (cerradosHoy) clauses.push(cerradosHoy + (cerradosHoy === 1 ? " cerrado" : " cerrados"));
+    var resumenHoy = clauses.length ? ("Hoy: " + clauses.join(", ") + ".") : "Sin movimientos hoy.";
+
+    var cerrados = enriched.filter(function (e) { return e.stage === "Cerrado" && !e.dl; }).map(function (e) {
+      var ci = codeOf(e.it.name, e.it.id);
+      return { code: ci.code, url: e.it.url, desc: cleanTitle(e.it.name, ci.bracketContent), cierre: cierreOf(e.it) };
+    });
+    cerrados.sort(function (a, b) { return (b.cierre || "") < (a.cierre || "") ? -1 : ((b.cierre || "") > (a.cierre || "") ? 1 : 0); });
+
+    var model = {
+      fechaISO: hoy,
+      fechaLarga: fmtLarga(hoy),
+      tablero: {
+        nombre: boardName.replace(/ - /g, " · "),
+        nombreOriginal: boardName,
+        url: "https://cosmos-digital-transformation.monday.com/boards/18429643827"
+      },
+      kpis: kpis,
+      resumen: resumen.join(" "),
+      matriz: matriz,
+      etapas: etapas,
+      areas: areas,
+      antiguedad: antiguedad,
+      tipos: tipos,
+      inventario: inventario,
+      filtros: filtros,
+      areasSel: areasSel,
+      totalTickets: enriched.filter(function (e) { return !e.dl; }).length,
+      cerrados: cerrados,
+      resumenHoy: resumenHoy,
+      movimientos: movimientos,
+      actualizado: fmtMedia(limaDate(raw.fetchedAt)) + ", " + fmtHora(raw.fetchedAt),
+      actualizadoISO: new Date(raw.fetchedAt - 5 * 3600e3).toISOString().slice(0, 16)
+    };
+    if (raw.warnings && raw.warnings.length) model.warnings = raw.warnings.slice();
+    return model;
+  }
+
+  global.BitacoraEngine = {
+    compute: compute,
+    _t: {
+      ticksToMs: ticksToMs,
+      limaDate: limaDate,
+      fmtHora: fmtHora,
+      fmtCorta: fmtCorta,
+      fmtMedia: fmtMedia,
+      fmtLarga: fmtLarga,
+      diasEntre: diasEntre,
+      cleanTitle: cleanTitle,
+      codeOf: codeOf,
+      stageOf: stageOf,
+      reabiertoOf: reabiertoOf,
+      areaTokens: areaTokens
+    }
+  };
+})(typeof window !== "undefined" ? window : this);
+
+;
+/* BitacoraData — loads the raw monday.com data snapshot published by the GitHub Actions workflow
+   (scripts/fetch-monday.mjs writes data/raw.json on a schedule). No live Claude/mcp dependency. */
+(function (global) {
+  "use strict";
+
+  function load(mcp, opts) {
+    return fetch("./data/raw.json", { cache: "no-store" }).then(function (r) {
+      if (!r.ok) throw new Error("No se pudo cargar data/raw.json (HTTP " + r.status + ")");
+      return r.json();
+    });
+  }
+
+  global.BitacoraData = { load: load };
+})(typeof window !== "undefined" ? window : this);
+
+;
+/* BitacoraRender — pure model -> HTML string for the Incidencias & Mejoras Go Live handover inventory.
+   Reuses class names from styles.css plus the additions in app.css. */
+(function (global) {
+  "use strict";
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  var MOV_LABEL = { nuevo: "Nuevo", reabierto: "Reabierto", cerrado: "Cerrado", retest: "Retest", revisado: "Revisado" };
+
+  function kpiCard(extraCls, alert, num, label) {
+    var cls = "kpi" + (extraCls ? " " + extraCls : "") + (alert ? " kpi-alert" : "");
+    return '<div class="' + cls + '"><div class="num">' + num + '</div><div class="label">' + label + "</div></div>";
+  }
+
+  function stackNote(r) {
+    var p = [r.bloq + (r.bloq === 1 ? " bloqueante" : " bloqueantes"), r.nobloq + " no bloq."];
+    if (r.none) p.push(r.none + " sin clasif.");
+    return p.join(" · ");
+  }
+
+  function stackRow(title, r) {
+    return (
+      '<div class="stat-row">' +
+      '<div class="stat-head"><span class="stat-title">' + esc(title) + '</span><span class="stat-note">' + stackNote(r) + "</span></div>" +
+      '<div class="stat-line"><div class="bar-track stack">' +
+      '<div class="seg seg-bloq" style="width:' + r.wB + '%"></div>' +
+      '<div class="seg seg-nobloq" style="width:' + r.wN + '%"></div>' +
+      (r.wX ? '<div class="seg seg-none" style="width:' + r.wX + '%"></div>' : "") +
+      '</div><div class="bar-val">' + r.n + "</div></div>" +
+      "</div>"
+    );
+  }
+
+  function compactRow(label, r) {
+    return (
+      '<div class="bar-row cmp"><div class="bar-label" title="' + esc(label) + '">' + esc(label) + "</div>" +
+      '<div class="bar-track stack">' +
+      '<div class="seg seg-bloq" style="width:' + r.wB + '%"></div>' +
+      '<div class="seg seg-nobloq" style="width:' + r.wN + '%"></div>' +
+      (r.wX ? '<div class="seg seg-none" style="width:' + r.wX + '%"></div>' : "") +
+      '</div><div class="bar-val">' + r.n + '</div><div class="bar-sub">' + (r.bloq ? r.bloq + " bloq." : "—") + "</div></div>"
+    );
+  }
+
+  function legend(withNone) {
+    return (
+      '<div class="legend"><span><i class="sw seg-bloq"></i>Bloqueante</span><span><i class="sw seg-nobloq"></i>No bloqueante</span>' +
+      (withNone ? '<span><i class="sw seg-none"></i>Sin clasificar</span>' : "") + "</div>"
+    );
+  }
+
+  function matrizHtml(m) {
+    function cellCls(fila, col, n) {
+      if (!n) return "zero";
+      if (fila.key === "bloq" && col === "Crítica") return "hot";
+      if ((fila.key === "bloq" && col === "Alta") || (fila.key !== "bloq" && col === "Crítica")) return "warm";
+      return "";
+    }
+    var head = '<tr><th class="row-h">Estado Go Live</th>' +
+      m.cols.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "<th>Total</th></tr>";
+    var rows = m.filas.map(function (f) {
+      return '<tr><td class="row-h"><span class="tag ' + f.glClase + '">' + esc(f.gl) + "</span></td>" +
+        f.cells.map(function (n, i) { return '<td class="' + cellCls(f, m.cols[i], n) + '">' + n + "</td>"; }).join("") +
+        '<td class="tot">' + f.total + "</td></tr>";
+    }).join("");
+    var total = '<tr class="total"><td class="row-h">Total</td>' +
+      m.totales.map(function (n) { return "<td>" + n + "</td>"; }).join("") + '<td class="tot">' + m.total + "</td></tr>";
+    return '<table class="matrix"><thead>' + head + "</thead><tbody>" + rows + total + "</tbody></table>";
+  }
+
+  function idLink(code, url) {
+    return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(code) + "</a>";
+  }
+
+  function fieldName(prefix, idx, code) {
+    return prefix + "_" + (idx < 10 ? "0" : "") + idx + "_" + String(code).replace(/[^A-Za-z0-9-]+/g, "");
+  }
+
+  /* ---- General report inventory ---- */
+  function invRow(r, conGl) {
+    var q = (r.code + " " + r.desc + " " + (r.rel || "")).toLowerCase();
+    return (
+      '<tr data-areas="|' + esc(r.areas.join("|")) + '|" data-etapa="' + esc(r.etapa) + '" data-tipo="' + esc(r.tipo) + '" data-q="' + esc(q) + '">' +
+      '<td class="id-cell">' + idLink(r.code, r.url) + "</td>" +
+      "<td>" + esc(r.desc) + (r.rel ? '<span class="rel">' + esc(r.rel) + "</span>" : "") + "</td>" +
+      "<td>" + esc(r.tipo) + "</td>" +
+      "<td>" + esc(r.area) + "</td>" +
+      '<td><span class="tag sev-' + esc(r.sev) + '">' + esc(r.sev) + "</span>" +
+      (conGl ? '<span class="tag gl-stack ' + esc(r.glClase) + '">' + esc(r.gl) + "</span>" : "") + "</td>" +
+      '<td class="et">' + esc(r.etapa) + (r.reab ? '<span class="tag reab-tag">Reabierto</span>' : "") + "</td>" +
+      '<td class="num-cell">' + (r.dias == null ? "—" : r.dias) + "</td>" +
+      "</tr>"
+    );
+  }
+
+  function invSection(s) {
+    var n = s.filas.length;
+    var body = n
+      ? s.filas.map(function (r) { return invRow(r, s.conGl); }).join("")
+      : '<tr><td colspan="7" class="empty-row">Sin tickets en esta categoría.</td></tr>';
+    return (
+      '<div class="inv-section sec-' + s.key + '" data-sec="' + s.key + '">' +
+      '<h4 class="inv-title">' + esc(s.titulo) + ' <span class="inv-count" data-full="' + n + '">' + n + "</span>" +
+      '<span class="inv-nota">' + esc(s.nota) + "</span></h4>" +
+      '<table class="moves inv" data-cont="' + esc(s.titulo) + '">' +
+      '<thead><tr><th style="width:74px">ID</th><th>Descripción</th><th style="width:70px">Tipo</th>' +
+      '<th style="width:108px">Área</th><th style="width:78px">Sev.</th><th style="width:92px">Etapa</th>' +
+      '<th style="width:40px">Días</th></tr></thead>' +
+      "<tbody>" + body + "</tbody></table></div>"
+    );
+  }
+
+  function kpiRow(k) {
+    return [
+      kpiCard("k-main", false, k.porAtender, "Por atender"),
+      kpiCard("", k.bloqueantes > 0, k.bloqueantes, "Bloqueantes ⚠"),
+      kpiCard("", false, k.noBloqueantes, "No bloqueantes"),
+      kpiCard("", false, k.criticos, "Críticos")
+    ].join("");
+  }
+
+  /* Contact data for the per-area review form (BitacoraPlantilla) and the suggested message.
+     Never mention a vendor change (not announced). */
+  var ANALISTA = { nombre: "Alonso Peña", cargo: "Analista Funcional", correo: "alonso.pena@cosmos.com.pe" };
+
+  function nombreAreas(areas) {
+    if (!areas || !areas.length) return "";
+    if (areas.length === 1) return areas[0];
+    return areas.slice(0, -1).join(", ") + " y " + areas[areas.length - 1];
+  }
+
+  function totalFilas(model) {
+    return model.inventario.reduce(function (s, x) { return s + x.filas.length; }, 0);
+  }
+
+  /* Plain-text message to send with each area's PDF (same wording as the form, no vendor mention). */
+  function mensajeArea(model, opts) {
+    opts = opts || {};
+    var area = nombreAreas(model.areasSel || []);
+    var total = totalFilas(model);
+    var fechaTxt = opts.fechaLimite ? global.BitacoraEngine._t.fmtLarga(opts.fechaLimite) : null;
+    if (!total) {
+      return ["Hola, equipo de " + area + ":", "", "Les informo que no hay incidencias o mejoras pendientes para su área en Cosmos Connect.",
+        "", "Saludos,", ANALISTA.nombre].join("\n");
+    }
+    return [
+      "Hola, equipo de " + area + ":",
+      "",
+      "Les comparto la revisión de " + (total === 1 ? "1 ticket pendiente" : total + " tickets pendientes") +
+        " de su área en Cosmos Connect (tablero de Incidencias & Mejoras Go Live).",
+      "",
+      "En cada ticket, marquen si está conforme, si solicitan una corrección o si ya no aplica. Pueden completar el " +
+        "formulario en el PDF o imprimirlo. Al terminar, guarden el PDF y envíenmelo" + (fechaTxt ? " a más tardar el " + fechaTxt : "") + ".",
+      "",
+      "Si tienen dudas, podemos revisarlo juntos.",
+      "",
+      "Saludos,",
+      ANALISTA.nombre
+    ].join("\n");
+  }
+
+  function options(label, id, values) {
+    return '<label>' + label + ' <select id="' + id + '"><option value="">Todas</option>' +
+      values.map(function (v) { return '<option value="' + esc(v) + '">' + esc(v) + "</option>"; }).join("") +
+      "</select></label>";
+  }
+
+  function movRow(m) {
+    return (
+      "<tr>" +
+      '<td class="id-cell">' + idLink(m.code, m.url) + "</td>" +
+      "<td>" +
+      '<span class="tag mov-' + m.tipo + '">' + MOV_LABEL[m.tipo] + "</span>" +
+      '<span class="mov-time">' + esc(m.hora) + "</span>" +
+      "</td>" +
+      "<td>" + esc(m.desc) + "</td>" +
+      "<td>" + esc(m.area) + "</td>" +
+      '<td><span class="tag sev-' + esc(m.sev) + '">' + esc(m.sev) + "</span></td>" +
+      '<td><span class="tag ' + esc(m.glClase) + '">' + esc(m.gl) + "</span></td>" +
+      "</tr>"
+    );
+  }
+
+  function render(model) {
+    var k = model.kpis;
+    var withNone = k.sinClasificar > 0;
+
+    var kpis = kpiRow(k);
+
+    var etapasHtml =
+      '<div class="estado-group group-baufest">' +
+      '<div class="estado-group-head"><span class="estado-group-title">Por atender</span><span class="estado-group-total">' +
+      k.porAtender + "</span></div>" +
+      model.etapas.baufest.map(function (r) { return stackRow(r.label, r); }).join("") +
+      "</div>" +
+      '<div class="estado-group group-cosmos">' +
+      '<div class="estado-group-head"><span class="estado-group-title">Ejecutar pruebas con Cosmos · fuera del total</span>' +
+      '<span class="estado-group-total">' + model.etapas.retest.n + "</span></div>" +
+      stackRow("Ejecutar pruebas", model.etapas.retest) +
+      "</div>" +
+      (model.etapas.reabiertos ? '<p class="panel-note">' + model.etapas.reabiertos +
+        (model.etapas.reabiertos === 1 ? " ticket por atender fue reabierto" : " tickets por atender fueron reabiertos") +
+        " (según la fecha de Reapertura).</p>" : "");
+
+    var areasHtml = model.areas.length
+      ? model.areas.map(function (r) { return compactRow(r.area, r); }).join("")
+      : '<p class="empty-row">Sin tickets por atender.</p>';
+
+    var warningsHtml = "";
+    if (model.warnings && model.warnings.length) {
+      warningsHtml = '<p class="panel-note">' + esc(model.warnings.join(" ")) + "</p>";
+    }
+
+    var totalInv = model.inventario.reduce(function (s, x) { return s + x.filas.length; }, 0);
+    var filtros =
+      '<div class="inv-filters" id="inv-filters">' +
+      options("Área", "f-area", model.filtros.areas) +
+      options("Etapa", "f-etapa", model.filtros.etapas) +
+      options("Tipo", "f-tipo", model.filtros.tipos) +
+      '<label class="grow">Buscar <input id="f-q" type="search" placeholder="ID o texto"></label>' +
+      '<span id="inv-shown" data-total="' + totalInv + '">' + totalInv + " tickets</span>" +
+      "</div>";
+
+    var movs = model.movimientos.filter(function (m) { return m.tipo !== "vacio"; });
+    var actividad = '<p class="resumen-hoy">' + esc(model.resumenHoy) + "</p>" +
+      (movs.length
+        ? '<table class="moves" data-cont="Actividad de hoy">' +
+          '<thead><tr><th style="width:74px">ID</th><th style="width:88px">Movim.</th><th>Descripción</th>' +
+          '<th style="width:108px">Área</th><th style="width:56px">Sev.</th><th style="width:100px">Go Live</th></tr></thead>' +
+          "<tbody>" + movs.map(movRow).join("") + "</tbody></table>"
+        : "");
+
+    return (
+      '<div class="page">' +
+      '<header class="report">' +
+      "<div>" +
+      '<p class="eyebrow">Cosmos Connect · Go Live</p>' +
+      '<p class="report-title">Incidencias &amp; Mejoras — Inventario Go Live</p>' +
+      '<p class="report-sub">Pendientes por atender del sistema Cosmos Connect · tablero <a href="' + esc(model.tablero.url) +
+      '" target="_blank" rel="noopener">' + esc(model.tablero.nombre) + "</a></p>" +
+      "</div>" +
+      '<div class="report-meta">' +
+      '<div class="date">' + esc(model.fechaLarga) + "</div>" +
+      "<div>" + k.porAtender + " tickets por atender</div>" +
+      "</div>" +
+      "</header>" +
+
+      '<section class="report-block">' +
+      '<div class="kpi-row four">' + kpis + "</div>" +
+      '<p class="lead-note">' + esc(model.resumen) + "</p>" +
+      '<div class="grid-2">' +
+      '<div class="panel"><h3>Matriz de prioridad <span class="n">— por atender, Estado Go Live × severidad</span></h3>' +
+      matrizHtml(model.matriz) +
+      '<p class="panel-note">Rojo: bloqueante crítico. Naranja: bloqueante alto o no bloqueante crítico.</p></div>' +
+      '<div class="panel"><h3>En qué etapa están <span class="n">— según la columna Etapa</span></h3>' +
+      legend(withNone) + etapasHtml + "</div>" +
+      "</div>" +
+      '<div class="grid-2">' +
+      '<div class="panel"><h3>Por área <span class="n">— por atender</span></h3>' + legend(withNone) + areasHtml + "</div>" +
+      '<div class="panel"><h3>Antigüedad <span class="n">— días desde la fecha de reporte</span></h3>' + legend(withNone) +
+      model.antiguedad.map(function (r) { return compactRow(r.label, r); }).join("") +
+      '<h3 class="sub-h">Por tipo <span class="n">— grupos del tablero</span></h3>' +
+      model.tipos.map(function (r) { return compactRow(r.label, r); }).join("") +
+      "</div>" +
+      "</div>" +
+      warningsHtml +
+      "</section>" +
+
+      '<section class="report-block">' +
+      '<h3 class="report-block-title">Inventario de tickets</h3>' +
+      '<p class="report-block-sub">Ordenado por severidad y antigüedad. El ID abre el ticket en monday.com; debajo de la descripción va el ticket relacionado.</p>' +
+      filtros +
+      model.inventario.map(function (s) { return invSection(s); }).join("") +
+      '<p class="empty-row" id="inv-empty" hidden>Ningún ticket coincide con los filtros.</p>' +
+      "</section>" +
+
+      '<section class="report-block">' +
+      '<h3 class="report-block-title">Actividad de hoy</h3>' +
+      actividad +
+      "</section>" +
+      "<footer><span>Última actualización: " + esc(model.actualizado) + "</span></footer>" +
+      "</div>"
+    );
+  }
+
+  global.BitacoraRender = { render: render, mensajeArea: mensajeArea, analista: ANALISTA, nombreAreas: nombreAreas };
+})(typeof window !== "undefined" ? window : this);
+
+;
+/* BitacoraPlantilla — master PDF form "Revisión de incidencias y mejoras" (jsPDF, real AcroForm fields).
+   Same visual and composition rules for every area; everything area- or report-specific comes from the
+   config object (app.js configRevision). Summary, subtotals and waiting days are computed from the
+   tickets. Browser port of C:\Temp\ccpdf\plantilla\plantilla_revision.py.
+   Font: Helvetica (PDF standard font, metrically identical to Arial; form fields use it too).
+   jsPDF draws the page content; the form fields are created afterwards with pdf-lib, which writes
+   complete field dictionaries (/DA, /DR, appearances). jsPDF's own AcroForm output lacked /DA and /DR
+   on text fields, so readers would not let users type. */
+(function (global) {
+  "use strict";
+
+  var MM = 72 / 25.4;
+  var PAGE_W = 595.28, PAGE_H = 841.89;
+  var M_L = 17 * MM, M_R = 17 * MM, M_T = 17 * MM;
+  var CONTENT_BOTTOM = PAGE_H - 25 * MM;     // y (from the top) where content must end
+  var FOOTER_RULE = PAGE_H - 19 * MM;
+  var CW = PAGE_W - M_L - M_R;
+  var INK = "#222222", INK2 = "#555555", RULE = "#D0D0D0";
+  var RULE_W = 0.5, FIELD_W = 0.6;
+  var COL_ID = 27 * MM, COL_SEV = 21 * MM, COL_ESP = 17 * MM, COL_GAP = 4 * MM;
+  var COL_DESC = CW - COL_ID - COL_SEV - COL_ESP - COL_GAP;
+  var X_ID = M_L, X_DESC = M_L + COL_ID, X_SEV = X_DESC + COL_DESC + COL_GAP, X_ESP = X_SEV + COL_SEV;
+  var RESP_X = X_DESC, RESP_W = CW - COL_ID;
+  var CONTROL = 11, FIELD_TEXT_H = 44, OBS_H = 72, REV_H = 22;
+  var SEV_ORDEN = ["Crítica", "Alta", "Media", "Baja"];
+  var ESTADO_PRUEBAS = "Ejecutar pruebas";
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+    "octubre", "noviembre", "diciembre"];
+
+  var ST = {
+    titulo: { size: 19.5, bold: true, lh: 23 },
+    subtitulo: { size: 13, lh: 16.5 },
+    sistema: { size: 10.5, lh: 13.5, color: INK2 },
+    aviso: { size: 10.5, bold: true, lh: 13.5 },
+    h1: { size: 12.5, bold: true, lh: 15.5 },
+    h2: { size: 11, bold: true, lh: 14 },
+    cuerpo: { size: 10.5, lh: 14.2 },
+    desc: { size: 11, lh: 14.5 },
+    sec: { size: 9.5, lh: 12.5, color: INK2 },
+    etiqueta: { size: 9.5, bold: true, lh: 12 },
+    metaEt: { size: 9, lh: 11.5, color: INK2 },
+    metaVal: { size: 10.5, lh: 13.5 },
+    col: { size: 9, lh: 11.5, color: INK2 },
+    celda: { size: 10.5, lh: 14 },
+    pie: { size: 9, lh: 11.5, color: INK2 }
+  };
+
+  /* Common classification criteria (same content as plantilla/criterios.json). */
+  var CRITERIOS = {
+    goLive: {
+      titulo: "Clasificación Go Live",
+      intro: "Es Bloqueante si cumple al menos una de estas condiciones:",
+      condiciones: [
+        { nombre: "Bloqueo operativo", texto: "impide completar correctamente el flujo.", ejemplo: "No se puede emitir la factura." },
+        { nombre: "Ámbito prioritario", texto: "afecta SUNAT, transmisiones, portal externo o funciones, datos o documentos de clientes, aunque el flujo pueda continuar.", ejemplo: "Un dato del cliente sale mal en el BL." }
+      ],
+      noBloqueante: "Es No bloqueante si no cumple ninguna de las condiciones anteriores: ajuste interno que permite continuar.",
+      noBloqueanteEjemplo: "Un filtro interno incompleto."
+    },
+    severidad: {
+      titulo: "Severidad",
+      descripcion: "Impacto en la operación.",
+      niveles: [
+        { nombre: "Crítica", texto: "detiene la operación o genera un incumplimiento, sin alternativa." },
+        { nombre: "Alta", texto: "afecta un proceso importante; hay alternativa, pero manual o costosa." },
+        { nombre: "Media", texto: "afecta parcialmente; existe una alternativa razonable." },
+        { nombre: "Baja", texto: "detalle visual o mejora menor." }
+      ]
+    },
+    estadoTicket: "El estado del ticket (Reportado, En revisión, Ejecutar pruebas) indica en qué punto del trabajo se encuentra; no es su clasificación."
+  };
+
+  // ---------------------------------------------------------------- data helpers
+  /* Standard PDF fonts use WinAnsi: keep Latin-1 plus its extra glyphs, map a few common symbols. */
+  var WINANSI_EXTRA = "€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ";
+  var MAPA = { "→": "->", "←": "<-", "≥": ">=", "≤": "<=", "≠": "!=", "✓": "(ok)", "✔": "(ok)", "×": "x", "\u00a0": " " };
+  function ansi(s) {
+    return String(s == null ? "" : s).replace(/[\s\S]/g, function (ch) {
+      if (MAPA[ch] !== undefined) return MAPA[ch];
+      var c = ch.charCodeAt(0);
+      if (c === 10 || (c >= 32 && c <= 126) || (c >= 160 && c <= 255) || WINANSI_EXTRA.indexOf(ch) !== -1) return ch;
+      return "";
+    });
+  }
+
+  function plural(n, s, p) { return n + " " + (n === 1 ? s : p); }
+
+  function fechaLarga(iso) {
+    var p = String(iso).slice(0, 10).split("-");
+    return Number(p[2]) + " de " + MESES[Number(p[1]) - 1] + " de " + p[0];
+  }
+
+  function fechaHoraLarga(iso) {
+    return fechaLarga(iso) + (String(iso).length >= 16 ? ", " + String(iso).slice(11, 16) : "");
+  }
+
+  function enumerar(partes) {
+    if (!partes.length) return "";
+    if (partes.length === 1) return partes[0];
+    var fin = partes.some(function (p) { return p.indexOf(",") !== -1; }) ? ", y " : " y ";
+    return partes.slice(0, -1).join(", ") + fin + partes[partes.length - 1];
+  }
+
+  function slug(s) { return String(s).replace(/[^A-Za-z0-9-]+/g, "") || "t"; }
+
+  function rangoSev(s) { var i = SEV_ORDEN.indexOf(s); return i === -1 ? SEV_ORDEN.length : i; }
+
+  var REQUERIDOS = [
+    ["sistema", "nombre del sistema o proyecto"], ["area", "nombre del área"], ["fechaEmision", "fecha de emisión"],
+    ["datosActualizados", "fecha de actualización de los datos"], ["fechaLimite", "fecha límite de respuesta"],
+    ["gerenciaResponsable", "gerencia responsable"], ["destinatario.correo", "correo del destinatario"]
+  ];
+
+  function valor(cfg, ruta) {
+    return ruta.split(".").reduce(function (v, k) { return v && typeof v === "object" ? v[k] : null; }, cfg);
+  }
+
+  function pendientes(cfg) {
+    var faltan = REQUERIDOS.filter(function (r) { return !valor(cfg, r[0]); }).map(function (r) { return r[1]; });
+    (cfg.tickets || []).forEach(function (t, i) {
+      var ref = t.id || "n.º " + (i + 1);
+      if (!t.id) faltan.push("ID del ticket " + ref);
+      if (!t.descripcion) faltan.push("descripción del ticket " + ref);
+      if (!t.severidad) faltan.push("severidad del ticket " + ref);
+      if (t.espera == null) faltan.push("fecha de reporte del ticket " + ref);
+    });
+    return faltan;
+  }
+
+  function agrupar(tickets) {
+    function orden(lst) {
+      return lst.slice().sort(function (a, b) {
+        var s = rangoSev(a.severidad) - rangoSev(b.severidad);
+        if (s) return s;
+        var ea = a.espera == null ? -1 : a.espera, eb = b.espera == null ? -1 : b.espera;
+        if (ea !== eb) return eb - ea;
+        return String(a.id) < String(b.id) ? -1 : (String(a.id) > String(b.id) ? 1 : 0);
+      });
+    }
+    var pruebas = tickets.filter(function (t) { return t.estado === ESTADO_PRUEBAS; });
+    var resto = tickets.filter(function (t) { return t.estado !== ESTADO_PRUEBAS; });
+    var bloq = resto.filter(function (t) { return t.clasificacion === "Bloqueante"; });
+    var grupos = [
+      ["Bloqueantes críticos", "Clasificación Go Live: Bloqueante. Severidad: Crítica.", bloq.filter(function (t) { return t.severidad === "Crítica"; }), false],
+      ["Otros bloqueantes", "Clasificación Go Live: Bloqueante.", bloq.filter(function (t) { return t.severidad !== "Crítica"; }), false],
+      ["No bloqueantes", "Clasificación Go Live: No bloqueante.", resto.filter(function (t) { return t.clasificacion === "No bloqueante"; }), false],
+      ["Sin clasificación Go Live", "Estos tickets aún no tienen clasificación Go Live asignada.",
+        resto.filter(function (t) { return ["Bloqueante", "No bloqueante", "Data Lake"].indexOf(t.clasificacion) === -1; }), false],
+      ["Data Lake", "Clasificación: Data Lake.", resto.filter(function (t) { return t.clasificacion === "Data Lake"; }), false],
+      ["En pruebas", "Tickets en la etapa Ejecutar pruebas. Confirme igualmente su clasificación.", pruebas, true]
+    ];
+    return grupos.filter(function (g) { return g[2].length; }).map(function (g) {
+      return { titulo: g[0], sub: g[1], tickets: orden(g[2]), mostrarClasif: g[3] };
+    });
+  }
+
+  function resumen(tickets) {
+    var n = tickets.length;
+    var bloq = tickets.filter(function (t) { return t.clasificacion === "Bloqueante"; });
+    var crit = bloq.filter(function (t) { return t.severidad === "Crítica"; });
+    var nob = tickets.filter(function (t) { return t.clasificacion === "No bloqueante"; });
+    var dl = tickets.filter(function (t) { return t.clasificacion === "Data Lake"; });
+    var sin = tickets.filter(function (t) { return ["Bloqueante", "No bloqueante", "Data Lake"].indexOf(t.clasificacion) === -1; });
+    var pruebas = tickets.filter(function (t) { return t.estado === ESTADO_PRUEBAS; });
+    var partes = [];
+    if (bloq.length) {
+      var b = bloq.length, c = crit.length;
+      if (c === 0) partes.push(plural(b, "bloqueante", "bloqueantes"));
+      else if (b === 1) partes.push("1 bloqueante crítico");
+      else if (c === b) partes.push(b + " bloqueantes, todos críticos");
+      else partes.push(b + " bloqueantes, de los cuales " + (c === 1 ? "1 es crítico" : c + " son críticos"));
+    }
+    if (nob.length) partes.push(plural(nob.length, "no bloqueante", "no bloqueantes"));
+    if (sin.length) partes.push(sin.length + " sin clasificación Go Live");
+    if (dl.length) partes.push(dl.length + " de Data Lake");
+    var texto = plural(n, "ticket pendiente", "tickets pendientes") + ": " + enumerar(partes) + ".";
+    if (pruebas.length) {
+      texto += " De ellos, " + (pruebas.length === 1 ? "1 se encuentra" : pruebas.length + " se encuentran") + " en la etapa Ejecutar pruebas.";
+    }
+    return texto;
+  }
+
+  // ---------------------------------------------------------------- rich text
+  /* Tokens: {t, b (bold), link (url)}; "**x**" markup is only parsed in the template's own strings. */
+  function R(s) {
+    return String(s).split("**").map(function (t, i) { return { t: t, b: i % 2 === 1 }; }).filter(function (x) { return x.t; });
+  }
+  /* b: true/false forces the weight; undefined inherits the style's weight */
+  function T(s, b) { return [{ t: ansi(s), b: b === undefined ? undefined : !!b }]; }
+
+  function Documento(pdf, cfg) {
+    this.pdf = pdf;
+    this.cfg = cfg;
+    this.y = M_T;
+    this.continuacion = null;
+    this.ultimaRegla = null;
+    this.campos = [];            // form fields, added with pdf-lib once the content is laid out
+  }
+
+  /* Register a form field at (x, y) from the top-left of the current page, in points. */
+  Documento.prototype.registrar = function (campo) {
+    campo.pagina = this.pdf.getCurrentPageInfo().pageNumber;
+    this.campos.push(campo);
+  };
+
+  Documento.prototype.setFont = function (st, bold) {
+    this.pdf.setFont("helvetica", (bold === undefined || bold === null ? st.bold : bold) ? "bold" : "normal");
+    this.pdf.setFontSize(st.size);
+  };
+
+  /* Wrap tokens into lines of segments within `width`. */
+  Documento.prototype.lineas = function (tokens, st, width) {
+    var self = this, lines = [[]], lineW = 0;
+    function ancho(t, b) { self.setFont(st, b); return self.pdf.getTextWidth(t); }
+    function empujar(seg) {
+      var last = lines[lines.length - 1];
+      var prev = last[last.length - 1];
+      if (prev && prev.b === seg.b && prev.link === seg.link && prev.color === seg.color) prev.t += seg.t;
+      else last.push(seg);
+    }
+    tokens.forEach(function (tok) {
+      var partes = String(tok.t).split(/(\n| )/);
+      partes.forEach(function (p) {
+        if (p === "") return;
+        if (p === "\n") { lines.push([]); lineW = 0; return; }
+        var w = ancho(p, tok.b);
+        if (p === " ") {
+          if (lineW === 0) return;
+          empujar({ t: " ", b: tok.b, link: tok.link, color: tok.color });
+          lineW += w;
+          return;
+        }
+        if (lineW + w > width && lineW > 0) {
+          var last = lines[lines.length - 1];
+          if (last.length && /\s$/.test(last[last.length - 1].t)) last[last.length - 1].t = last[last.length - 1].t.replace(/\s+$/, "");
+          lines.push([]);
+          lineW = 0;
+        }
+        while (w > width) {           // a single word wider than the column: break it by characters
+          var k = p.length;
+          while (k > 1 && ancho(p.slice(0, k), tok.b) > width) k--;
+          empujar({ t: p.slice(0, k), b: tok.b, link: tok.link, color: tok.color });
+          lines.push([]);
+          p = p.slice(k);
+          w = ancho(p, tok.b);
+        }
+        empujar({ t: p, b: tok.b, link: tok.link, color: tok.color });
+        lineW += w;
+      });
+    });
+    return lines.filter(function (l, i) { return l.length || i === 0; });
+  };
+
+  Documento.prototype.alto = function (tokens, st, width) {
+    return this.lineas(tokens, st, width).length * st.lh;
+  };
+
+  /* Draw wrapped tokens with their top at this.y (or at `top`); returns height. */
+  Documento.prototype.texto = function (tokens, st, x, width, opts) {
+    opts = opts || {};
+    var pdf = this.pdf, self = this;
+    var top = opts.top != null ? opts.top : this.y;
+    var lines = opts.lines || this.lineas(tokens, st, width);
+    lines.forEach(function (line, i) {
+      var base = top + i * st.lh + (st.lh - st.size) / 2 + st.size * 0.78;
+      var lw = line.reduce(function (s, seg) { self.setFont(st, seg.b); return s + pdf.getTextWidth(seg.t); }, 0);
+      var cx = opts.derecha ? x + width - lw : x;
+      line.forEach(function (seg) {
+        self.setFont(st, seg.b);
+        pdf.setTextColor(seg.color || st.color || INK);
+        pdf.text(seg.t, cx, base);
+        var w = pdf.getTextWidth(seg.t);
+        if (seg.link) {
+          pdf.setDrawColor(INK);
+          pdf.setLineWidth(0.5);
+          pdf.line(cx, base + 1.5, cx + w, base + 1.5);
+          pdf.link(cx, base - st.size * 0.8, w, st.size, { url: seg.link });
+        }
+        cx += w;
+      });
+    });
+    return lines.length * st.lh;
+  };
+
+  // ---------------------------------------------------------------- page mechanics
+  Documento.prototype.disponible = function () { return CONTENT_BOTTOM - this.y; };
+
+  Documento.prototype.nuevaPagina = function () {
+    this.pdf.addPage();
+    this.y = M_T;
+    if (this.continuacion) this.continuacion();
+  };
+
+  Documento.prototype.asegurar = function (h) {
+    if (h > this.disponible() && this.y > M_T + 1) this.nuevaPagina();
+  };
+
+  Documento.prototype.regla = function (y) {
+    y = y == null ? this.y : y;
+    this.ultimaRegla = { pagina: this.pdf.getCurrentPageInfo().pageNumber, y: y };
+    this.pdf.setDrawColor(RULE);
+    this.pdf.setLineWidth(RULE_W);
+    this.pdf.line(M_L, y, PAGE_W - M_R, y);
+  };
+
+  Documento.prototype.tituloSeccion = function (texto, siguienteMin) {
+    var h = 12 + this.alto(T(texto), ST.h1, CW) + 6;
+    this.asegurar(h + siguienteMin);
+    var r = this.ultimaRegla;
+    var reciente = r && r.pagina === this.pdf.getCurrentPageInfo().pageNumber && this.y - r.y < 14;
+    if (this.y > M_T + 1 && !reciente) this.regla(this.y + 2);
+    this.y += 12;
+    this.y += this.texto(T(texto), ST.h1, M_L, CW) + 6;
+  };
+
+  Documento.prototype.pies = function () {
+    var pdf = this.pdf, cfg = this.cfg, n = pdf.getNumberOfPages();
+    for (var i = 1; i <= n; i++) {
+      pdf.setPage(i);
+      pdf.setDrawColor(RULE);
+      pdf.setLineWidth(RULE_W);
+      pdf.line(M_L, FOOTER_RULE, PAGE_W - M_R, FOOTER_RULE);
+      var izq = T("Área: " + (cfg.area || "pendiente")).concat(T("\nDatos actualizados al " +
+        (cfg.datosActualizados ? fechaHoraLarga(cfg.datosActualizados) : "pendiente")));
+      this.texto(izq, ST.pie, M_L, CW * 0.72, { top: FOOTER_RULE + 3 });
+      this.texto(T("Página " + i + " de " + n), ST.pie, PAGE_W - M_R - CW * 0.25, CW * 0.25, { top: FOOTER_RULE + 3, derecha: true });
+    }
+  };
+
+  // ---------------------------------------------------------------- sections
+  Documento.prototype.identificacion = function (faltan) {
+    var cfg = this.cfg;
+    this.y += this.texto(T("Revisión de incidencias y mejoras"), ST.titulo, M_L, CW) + 3;
+    this.y += this.texto(T("Área: ").concat(T(cfg.area || "pendiente", true)), ST.subtitulo, M_L, CW) + 2;
+    if (cfg.sistema) {
+      this.y += this.texto(T("Sistema: " + cfg.sistema + (cfg.etapaProyecto ? ", etapa " + cfg.etapaProyecto : "")), ST.sistema, M_L, CW);
+    }
+    if (faltan.length) {
+      this.y += 6;
+      this.y += this.texto(T("Borrador. Datos obligatorios pendientes: " + enumerar(faltan) + ".", true), ST.aviso, M_L, CW);
+    }
+    this.y += 10;
+
+    var items = [];
+    if (cfg.fechaEmision) items.push(["Fecha de emisión", T(fechaLarga(cfg.fechaEmision))]);
+    if (cfg.datosActualizados) items.push(["Datos actualizados al", T(fechaHoraLarga(cfg.datosActualizados))]);
+    if (cfg.fechaLimite) items.push(["Fecha límite de respuesta", T(fechaLarga(cfg.fechaLimite), true)]);
+    if (cfg.gerenciaResponsable) items.push(["Gerencia Responsable", T(cfg.gerenciaResponsable)]);
+    var dest = cfg.destinatario || {};
+    if (dest.correo) items.push(["Enviar respuestas a", T((dest.nombre ? dest.nombre + "\n" : "") + dest.correo)]);
+    var tab = cfg.tablero || {};
+    if (tab.nombre) items.push(["Tablero de origen", [{ t: ansi(tab.nombre), link: tab.url || null }]]);
+    var estados = {};
+    (cfg.tickets || []).forEach(function (t) { if (t.estado) estados[t.estado] = true; });
+    var lista = Object.keys(estados);
+    if (lista.length === 1) items.push(["Estado de los tickets", T(lista[0])]);
+
+    var ncol = 3, gap = 6 * MM, wcol = (CW - gap * (ncol - 1)) / ncol;
+    for (var f = 0; f < items.length; f += ncol) {
+      var fila = items.slice(f, f + ncol), max = 0, self = this;
+      fila.forEach(function (it, i) {
+        var x = M_L + i * (wcol + gap);
+        var he = self.texto(T(it[0]), ST.metaEt, x, wcol);
+        var hv = self.texto(it[1], ST.metaVal, x, wcol, { top: self.y + he + 1 });
+        max = Math.max(max, he + 1 + hv);
+      });
+      this.y += max + 8;
+    }
+    this.regla(this.y);
+    this.y += 2;
+  };
+
+  Documento.prototype.objetivoEInstrucciones = function () {
+    var cfg = this.cfg, self = this;
+    var objetivo = "Revise la clasificación de los tickets pendientes de su área en " + (cfg.sistema || "el sistema") +
+      ". Sus respuestas se usarán para actualizar la clasificación en el tablero y definir el orden de atención.";
+    if (cfg.periodicidad) objetivo += " Se le informará el avance " + cfg.periodicidad + ".";
+    var pasos = [
+      R("Marque una respuesta en cada ticket: **Conforme**, **Solicito corrección** o **Ya no aplica**."),
+      R("Si solicita una corrección, indique el dato que debe cambiar, el valor propuesto y el motivo. Si el ticket ya no aplica, explique el motivo."),
+      R("Complete los datos del revisor y envíe el documento según se indica al final.")
+    ];
+    this.tituloSeccion("Objetivo e instrucciones", 40);
+    this.y += this.texto(T(objetivo), ST.cuerpo, M_L, CW) + 6;
+    pasos.forEach(function (paso, i) {
+      var h = self.alto(paso, ST.cuerpo, CW - 14);
+      self.asegurar(h);
+      self.texto(T((i + 1) + "."), ST.cuerpo, M_L, 14);
+      self.y += self.texto(paso, ST.cuerpo, M_L + 14, CW - 14) + 2;
+    });
+    this.y += 3;
+    this.y += this.texto(T("Puede completar el formulario en el PDF o imprimirlo y completarlo a mano. Los campos marcados con * son obligatorios."),
+      ST.sec, M_L, CW) + 4;
+  };
+
+  Documento.prototype.cabeceraColumnas = function (dibujar) {
+    var cols = [["ID", X_ID, COL_ID, false], ["Descripción", X_DESC, COL_DESC, false], ["Severidad", X_SEV, COL_SEV, false],
+      ["Espera", X_ESP, COL_ESP, true]];
+    var h = ST.col.lh;
+    if (dibujar) {
+      var self = this;
+      cols.forEach(function (c) { self.texto(T(c[0]), ST.col, c[1], c[2], { derecha: c[3] }); });
+      this.y += h + 3;
+      this.regla();
+    }
+    return h + 3;
+  };
+
+  Documento.prototype.cabeceraGrupo = function (g, continua, dibujar) {
+    var titulo = continua ? g.titulo + " (continuación)" : g.titulo + " (" + plural(g.tickets.length, "ticket", "tickets") + ")";
+    var h = 10 + this.alto(T(titulo), ST.h2, CW) + 2 + (continua ? 0 : this.alto(T(g.sub), ST.sec, CW) + 5) + this.cabeceraColumnas(false);
+    if (dibujar) {
+      this.y += 10;
+      this.y += this.texto(T(titulo), ST.h2, M_L, CW) + 2;
+      if (!continua) this.y += this.texto(T(g.sub), ST.sec, M_L, CW) + 5;
+      this.cabeceraColumnas(true);
+    }
+    return h;
+  };
+
+  /* Description column content: description lines + one secondary line per extra datum. */
+  Documento.prototype.flujo = function (t, mostrarClasif) {
+    var self = this, out = [];
+    this.lineas(t.descripcion ? T(t.descripcion) : T("Descripción pendiente", true), ST.desc, COL_DESC).forEach(function (l) {
+      out.push({ line: l, st: ST.desc });
+    });
+    var sec = (t.relaciones || []).filter(Boolean).slice();
+    if (mostrarClasif) sec.push("Clasificación Go Live: " + (t.clasificacion || "sin asignar"));
+    if (t._estadoPropio && !mostrarClasif) sec.push("Estado del ticket: " + t.estado);
+    if (t.reabierto) sec.push("Reabierto");
+    if (t.tipo === "Mejora") sec.push("Tipo: Mejora");
+    sec.forEach(function (s) {
+      self.lineas(T(s), ST.sec, COL_DESC).forEach(function (l) { out.push({ line: l, st: ST.sec }); });
+    });
+    return out;
+  };
+
+  function altoFlujo(flujo) { return flujo.reduce(function (s, f) { return s + f.st.lh; }, 0); }
+
+  Documento.prototype.altoFila = function (t, flujo, continua) {
+    var idLines = this.lineas(T((t.id || "ID pendiente") + (continua ? "\n(continuación)" : ""), true), ST.celda, COL_ID - 3).length;
+    return 7 + Math.max(idLines * ST.celda.lh, altoFlujo(flujo), ST.celda.lh);
+  };
+
+  Documento.prototype.fila = function (t, flujo, continua) {
+    var h = this.altoFila(t, flujo, continua), y0 = this.y + 7, self = this;
+    var idTok = [{ t: ansi(t.id || "ID pendiente"), b: true, link: !continua && t.url ? t.url : null }];
+    if (continua) idTok.push({ t: "\n(continuación)", b: true });
+    this.texto(idTok, ST.celda, X_ID, COL_ID - 3, { top: y0 });
+    var yy = y0;
+    flujo.forEach(function (f) {
+      self.texto(null, f.st, X_DESC, COL_DESC, { top: yy, lines: [f.line] });
+      yy += f.st.lh;
+    });
+    if (!continua) {
+      var sev = t.severidad || "Pendiente";
+      this.texto(T(sev, sev === "Crítica"), ST.celda, X_SEV, COL_SEV, { top: y0 });
+      this.texto(T(t.espera == null ? "Sin fecha" : plural(t.espera, "día", "días")), ST.celda, X_ESP, COL_ESP, { top: y0, derecha: true });
+    }
+    this.y += h;
+  };
+
+  Documento.prototype.altoRespuesta = function () {
+    return 8 + 12 + 3 + 14 + 7 + 12 + 3 + 14 + 7 + 12 + 3 + FIELD_TEXT_H + 10;
+  };
+
+  Documento.prototype.respuesta = function (t, idx) {
+    var pdf = this.pdf, self = this;
+    var base = "t" + (idx < 10 ? "0" : "") + idx + "_" + slug(t.id);
+    var y = this.y + 8;
+
+    function etiqueta(tokens) { y += self.texto(tokens, ST.etiqueta, RESP_X, RESP_W, { top: y }); }
+
+    function filaOpciones(opciones, crear) {
+      var x = RESP_X;
+      opciones.forEach(function (o) {
+        crear(x, y - 0.3, o[1]);   // control centred on the label's x-height
+        self.texto(T(o[0]), ST.cuerpo, x + CONTROL + 5, 300, { top: y + 0.5 - (ST.cuerpo.lh - CONTROL) / 2 });
+        self.setFont(ST.cuerpo);
+        x += CONTROL + 5 + pdf.getTextWidth(o[0]) + 18;
+      });
+      y += 14;
+    }
+
+    etiqueta(T("Respuesta *", true));
+    y += 3;
+    filaOpciones([["Conforme", "Conforme"], ["Solicito corrección", "Correccion"], ["Ya no aplica", "NoAplica"]], function (x, yy, v) {
+      pdf.setDrawColor(INK2);
+      pdf.setLineWidth(0.8);
+      pdf.circle(x + CONTROL / 2, yy + CONTROL / 2, CONTROL / 2 - 0.4, "S");
+      self.registrar({ tipo: "radio", nombre: "resp_" + base, valor: v, x: x, y: yy, w: CONTROL, h: CONTROL });
+    });
+    y += 7;
+
+    etiqueta([{ t: "Dato que solicita cambiar ", b: true }, { t: "(solo si solicita corrección)", b: false, color: INK2 }]);
+    y += 3;
+    filaOpciones([["Área", "area"], ["Clasificación Go Live", "clasificacion"], ["Severidad", "severidad"], ["Otro", "otro"]], function (x, yy, k) {
+      pdf.setDrawColor(INK2);
+      pdf.setLineWidth(0.8);
+      pdf.rect(x, yy, CONTROL, CONTROL, "S");
+      self.registrar({ tipo: "casilla", nombre: "dato_" + base + "_" + k, x: x, y: yy, w: CONTROL, h: CONTROL });
+    });
+    y += 7;
+
+    var wProp = RESP_W * 0.36, wMot = RESP_W - wProp - 8;
+    this.texto(T("Valor propuesto", true), ST.etiqueta, RESP_X, wProp, { top: y });
+    this.texto(T("Motivo o comentario", true), ST.etiqueta, RESP_X + wProp + 8, wMot, { top: y });
+    y += 12 + 3;
+    [["propuesto", RESP_X, wProp], ["motivo", RESP_X + wProp + 8, wMot]].forEach(function (c) {
+      self.campo(c[0] + "_" + base, c[1], y, c[2], FIELD_TEXT_H, true, false);
+    });
+    y += FIELD_TEXT_H + 10;
+    this.y = y;
+    this.regla();
+  };
+
+  Documento.prototype.campo = function (nombre, x, y, w, h, multilinea, requerido) {
+    var pdf = this.pdf;
+    pdf.setDrawColor(INK2);
+    pdf.setLineWidth(FIELD_W);
+    pdf.rect(x, y, w, h, "S");
+    this.registrar({ tipo: "texto", nombre: nombre, x: x + 1, y: y + 1, w: w - 2, h: h - 2, multilinea: !!multilinea, requerido: !!requerido });
+  };
+
+  Documento.prototype.ticket = function (t, idx, mostrarClasif) {
+    var flujo = this.flujo(t, mostrarClasif);
+    var util = CONTENT_BOTTOM - M_T - 40;
+    var total = this.altoFila(t, flujo, false) + this.altoRespuesta();
+    if (total <= util) {
+      this.asegurar(total);
+      this.fila(t, flujo, false);
+      this.respuesta(t, idx);
+      return;
+    }
+    // Exceptional ticket taller than a page: split the description; the ID is marked "(continuación)"
+    // on the next page and the answer block always stays with the end of the description.
+    var continua = false, pend = flujo;
+    while (pend.length) {
+      var disp = this.disponible() - 12 - 7, usado = 0, k = 0;
+      while (k < pend.length && usado + pend[k].st.lh <= disp) { usado += pend[k].st.lh; k++; }
+      var enPagina = pend.slice(0, k), resto = pend.slice(k);
+      if (!resto.length && this.altoFila(t, enPagina, continua) + this.altoRespuesta() > this.disponible()) {
+        var lleva = Math.max(1, Math.min(enPagina.length, 3));
+        resto = enPagina.slice(enPagina.length - lleva);
+        enPagina = enPagina.slice(0, enPagina.length - lleva);
+      }
+      if (enPagina.length) this.fila(t, enPagina, continua);
+      if (!resto.length) { this.respuesta(t, idx); return; }
+      this.nuevaPagina();
+      continua = true;
+      pend = resto;
+    }
+  };
+
+  Documento.prototype.tickets = function (tickets) {
+    var self = this, estados = {};
+    tickets.forEach(function (t) { if (t.estado) estados[t.estado] = true; });
+    var varios = Object.keys(estados).length > 1;
+    tickets.forEach(function (t) { t._estadoPropio = varios && !!t.estado; });
+    this.tituloSeccion("Tickets por revisar", 60);
+    this.y += this.texto(T(resumen(tickets)), ST.cuerpo, M_L, CW) + 2;
+    var idx = 0;
+    agrupar(tickets).forEach(function (g) {
+      var primero = g.tickets[0];
+      var hPrimero = self.altoFila(primero, self.flujo(primero, g.mostrarClasif), false) + self.altoRespuesta();
+      var hCab = self.cabeceraGrupo(g, false, false);
+      var util = CONTENT_BOTTOM - M_T - 40;
+      var requerido = hPrimero <= util ? hPrimero : 120;
+      self.asegurar(hCab + Math.min(requerido, util - hCab));
+      self.cabeceraGrupo(g, false, true);
+      self.continuacion = function () { self.cabeceraGrupo(g, true, true); };
+      g.tickets.forEach(function (t) { idx++; self.ticket(t, idx, g.mostrarClasif); });
+      self.continuacion = null;
+      self.y += 4;
+    });
+  };
+
+  Documento.prototype.criterios = function () {
+    var c = CRITERIOS, bloques = [];
+    bloques.push(["h2", T(c.goLive.titulo)]);
+    bloques.push(["cuerpo", T(c.goLive.intro)]);
+    c.goLive.condiciones.forEach(function (x) {
+      bloques.push(["lista", [{ t: x.nombre + ":", b: true }, { t: " " + x.texto + " Ejemplo: " + x.ejemplo }]]);
+    });
+    bloques.push(["cuerpo", T(c.goLive.noBloqueante + " Ejemplo: " + c.goLive.noBloqueanteEjemplo)]);
+    bloques.push(["h2", T(c.severidad.titulo)]);
+    bloques.push(["cuerpo", T(c.severidad.descripcion)]);
+    c.severidad.niveles.forEach(function (x) { bloques.push(["lista", [{ t: x.nombre + ":", b: true }, { t: " " + x.texto }]]); });
+    bloques.push(["h2", T("Estado del ticket")]);
+    bloques.push(["cuerpo", T(c.estadoTicket)]);
+
+    this.tituloSeccion("Criterios de clasificación", 60);
+    var self = this;
+    bloques.forEach(function (b, i) {
+      var st = b[0] === "h2" ? ST.h2 : ST.cuerpo;
+      var lista = b[0] === "lista", w = lista ? CW - 14 : CW;
+      var antes = b[0] === "h2" && i ? 6 : 0;
+      var h = self.alto(b[1], st, w);
+      var siguiente = b[0] === "h2" && bloques[i + 1] ? self.alto(bloques[i + 1][1], ST.cuerpo, CW) : 0;
+      self.asegurar(antes + h + siguiente);
+      self.y += antes;
+      if (lista) self.texto(T("•"), st, M_L + 2, 10);
+      self.y += self.texto(b[1], st, lista ? M_L + 14 : M_L, w) + 3;
+    });
+  };
+
+  Documento.prototype.observaciones = function () {
+    this.tituloSeccion("Observaciones generales", 12 + 4 + OBS_H);
+    this.y += this.texto(T("Opcional. Use este espacio para comentarios que no correspondan a un ticket específico."), ST.sec, M_L, CW) + 4;
+    this.campo("observaciones_generales", M_L, this.y, CW, OBS_H, true, false);
+    this.y += OBS_H + 6;
+  };
+
+  Documento.prototype.revisorYEntrega = function () {
+    var cfg = this.cfg, dest = cfg.destinatario || {}, self = this;
+    var destino = dest.nombre ? dest.nombre + " (" + (dest.correo || "") + ")" : (dest.correo || "");
+    var entrega = T("Guarde el PDF con sus respuestas y envíelo a " + destino);
+    if (cfg.fechaLimite) entrega = entrega.concat(T(" a más tardar el ")).concat(T(fechaLarga(cfg.fechaLimite), true)).concat(T("."));
+    else entrega = entrega.concat(T("."));
+    var bloque = 12 + 3 + REV_H + 10 + this.alto(entrega, ST.cuerpo, CW);
+    this.tituloSeccion("Datos del revisor y entrega", bloque);
+    var gap = 6 * MM, w1 = CW * 0.42, w2 = CW * 0.33, w3 = CW - w1 - w2 - 2 * gap;
+    [["revisor_nombre", "Nombre y apellido *", M_L, w1], ["revisor_cargo", "Cargo *", M_L + w1 + gap, w2],
+      ["revisor_fecha", "Fecha de revisión *", M_L + w1 + w2 + 2 * gap, w3]].forEach(function (c) {
+      self.texto(T(c[1], true), ST.etiqueta, c[2], c[3]);
+      self.campo(c[0], c[2], self.y + 12 + 3, c[3], REV_H, false, true);
+    });
+    this.y += 12 + 3 + REV_H + 10;
+    this.y += this.texto(entrega, ST.cuerpo, M_L, CW);
+  };
+
+  Documento.prototype.sinTickets = function () {
+    this.tituloSeccion("Resultado", 20);
+    this.y += this.texto(T("No hay incidencias o mejoras pendientes para esta área."), ST.cuerpo, M_L, CW);
+  };
+
+  Documento.prototype.componer = function () {
+    var tickets = this.cfg.tickets || [];
+    this.identificacion(pendientes(this.cfg));
+    if (!tickets.length) {
+      this.sinTickets();
+    } else {
+      this.objetivoEInstrucciones();
+      this.tickets(tickets);
+      this.criterios();
+      this.observaciones();
+      this.revisorYEntrega();
+    }
+    this.pies();
+  };
+
+  /* Add the registered fields with pdf-lib: exclusive radio groups, check boxes and text fields, all
+     starting empty; text fields use Helvetica 10 pt with scrolling disabled so everything typed stays
+     visible when saved, reopened and printed. Borders are drawn in the page content (visible on paper
+     even where a reader does not render widgets). Tab order: by rows (/Tabs /R). */
+  async function agregarCampos(bytes, campos) {
+    var L = global.PDFLib;
+    var doc = await L.PDFDocument.load(bytes);
+    var form = doc.getForm();
+    var helv = await doc.embedFont(L.StandardFonts.Helvetica);
+    var paginas = doc.getPages();
+    var negro = L.rgb(0x22 / 255, 0x22 / 255, 0x22 / 255);
+    var grupos = {};
+    campos.forEach(function (c) {
+      var page = paginas[c.pagina - 1];
+      var r = { x: c.x, y: page.getHeight() - c.y - c.h, width: c.w, height: c.h, borderWidth: 0, textColor: negro };
+      if (c.tipo === "radio") {
+        var g = grupos[c.nombre];
+        if (!g) {
+          g = grupos[c.nombre] = form.createRadioGroup(c.nombre);
+          g.enableRequired();
+        }
+        g.addOptionToPage(c.valor, page, r);
+      } else if (c.tipo === "casilla") {
+        form.createCheckBox(c.nombre).addToPage(page, r);
+      } else {
+        var tf = form.createTextField(c.nombre);
+        if (c.multilinea) tf.enableMultiline();
+        tf.disableScrolling();
+        if (c.requerido) tf.enableRequired();
+        r.font = helv;
+        tf.addToPage(page, r);
+        tf.setFontSize(10);
+      }
+    });
+    form.updateFieldAppearances(helv);
+    var af = form.acroForm.dict;
+    af.set(L.PDFName.of("DR"), doc.context.obj({ Font: { Helvetica: helv.ref } }));
+    af.set(L.PDFName.of("DA"), L.PDFString.of("/Helvetica 10 Tf 0 g"));
+    paginas.forEach(function (pg) { pg.node.set(L.PDFName.of("Tabs"), L.PDFName.of("R")); });
+    doc.setLanguage("es-PE");
+    return doc.save();
+  }
+
+  /* config → Promise<{ blob, paginas, pendientes }>. Requires jsPDF (window.jspdf) and pdf-lib (window.PDFLib). */
+  async function generar(config) {
+    var J = global.jspdf;
+    if (!J || !J.jsPDF) throw new Error("jsPDF no disponible");
+    if (!global.PDFLib) throw new Error("pdf-lib no disponible");
+    var cfg = JSON.parse(JSON.stringify(config));
+    var pdf = new J.jsPDF({ unit: "pt", format: "a4", orientation: "portrait", compress: true });
+    pdf.setProperties({
+      title: ansi("Revisión de incidencias y mejoras. Área: " + (cfg.area || "pendiente")),
+      subject: "Formulario de revisión de incidencias y mejoras",
+      author: ansi(cfg.gerenciaResponsable || "")
+    });
+    var doc = new Documento(pdf, cfg);
+    doc.componer();
+    var bytes = await agregarCampos(pdf.output("arraybuffer"), doc.campos);
+    return { blob: new Blob([bytes], { type: "application/pdf" }), paginas: pdf.getNumberOfPages(), pendientes: pendientes(cfg) };
+  }
+
+  global.BitacoraPlantilla = { generar: generar, resumen: resumen, agrupar: agrupar, pendientes: pendientes, ansi: ansi };
+})(typeof window !== "undefined" ? window : this);
+
+;
+/* BitacoraApp — toolbar/boot/load/refresh/PDF export. Depends on BitacoraData, BitacoraEngine, BitacoraRender. */
+(function (global) {
+  "use strict";
+
+  var mcp = null;
+  var dl = null;
+  var lastModel = null;
+  var lastRaw = null;
+  var lastFetchedAtHora = null;
+  var lastLoadTime = 0;
+
+  var NOTICE = {
+    NO_MCP: "Esta vista no puede consultar monday.com. Abre el reporte desde claude.ai con el conector de monday.com activo.",
+    NO_CONNECTOR: "No encontramos el conector de monday.com. Agrégalo o selecciónalo en claude.ai → Configuración → Conectores y vuelve a cargar.",
+    REAUTH: "La conexión con monday.com venció. Vuelve a conectarla en claude.ai → Configuración → Conectores.",
+    NOT_MANIFEST: "El acceso a monday.com no está habilitado para esta página. Actívalo en los permisos de la página y recarga.",
+    POLICY: "Tu organización no permite esta consulta a monday.com desde aquí.",
+    UNAVAILABLE: "monday.com no respondió. Intenta de nuevo con «Actualizar».",
+    PDF_LOAD: "No se pudo cargar el generador de PDF. Revisa tu conexión y recarga.",
+    PDF_BUSY: "Hay una descarga pendiente; intenta en unos segundos.",
+    PDF_UNAVAILABLE: "La descarga de PDF no está disponible en esta vista.",
+    PDF_OTHER: "No se pudo generar el PDF.",
+  };
+
+  /* Standalone Lima-time formatter (UTC-5, no DST) so this file has no hard dependency on engine internals. */
+  function fmtHora(ms) {
+    var d = new Date(ms - 5 * 3600000);
+    var h = d.getUTCHours();
+    var m = d.getUTCMinutes();
+    var ampm = h < 12 ? "am" : "pm";
+    var h12 = h % 12 || 12;
+    var mm = m < 10 ? "0" + m : "" + m;
+    return h12 + ":" + mm + " " + ampm;
+  }
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function showNotice(text) {
+    var n = el("notice");
+    if (!n) return;
+    if (!text) {
+      n.hidden = true;
+      n.textContent = "";
+      return;
+    }
+    n.textContent = text;
+    n.hidden = false;
+  }
+
+  function noticeForCode(code, message) {
+    switch (code) {
+      case null:
+      case undefined:
+      case "not_granted":
+      case "capability_disabled":
+      case "capability_removed":
+        return NOTICE.NO_MCP;
+      case "server_not_connected":
+      case "selection_required":
+      case "server_not_found":
+        return NOTICE.NO_CONNECTOR;
+      case "needs_reauth":
+        return NOTICE.REAUTH;
+      case "not_in_manifest":
+        return NOTICE.NOT_MANIFEST;
+      case "blocked_by_policy":
+      case "approval_required":
+        return NOTICE.POLICY;
+      case "server_unavailable":
+      case "rate_limited":
+      case "upstream_error":
+      case "cancelled":
+        return NOTICE.UNAVAILABLE;
+      case "tool_error":
+        return "monday.com devolvió un error: " + message;
+      default:
+        return "No se pudo cargar el reporte (" + code + ").";
+    }
+  }
+
+  function wait(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  function retryDelay(err) {
+    if (err && typeof err.retryAfterMs === "number") return err.retryAfterMs;
+    return 1500 + Math.random() * 1500;
+  }
+
+  async function fetchOnce(now, refresh) {
+    var raw = await BitacoraData.load(mcp, { now: now, refresh: refresh });
+    var model = BitacoraEngine.compute(raw);
+    return { raw: raw, model: model };
+  }
+
+  async function load(opts) {
+    opts = opts || {};
+    var refresh = !!opts.refresh;
+    var btn = el("btn-refresh");
+    if (btn) btn.disabled = true;
+
+    var now = typeof global.__BITACORA_NOW__ === "number" ? global.__BITACORA_NOW__ : Date.now();
+    var model = null;
+    var fetchedAt = null;
+    var err = null;
+
+    var attempt = 0;
+    while (attempt < 2) {
+      try {
+        var res = await fetchOnce(now, refresh);
+        model = res.model;
+        lastRaw = res.raw;
+        fetchedAt = res.raw.fetchedAt;
+        err = null;
+        break;
+      } catch (e) {
+        err = e;
+        if (attempt === 0 && e && e.retryable === true) {
+          await wait(retryDelay(e));
+          attempt++;
+          continue;
+        }
+        break;
+      }
+    }
+
+    var status = el("status");
+    if (model) {
+      lastModel = model;
+      lastFetchedAtHora = fmtHora(fetchedAt);
+      el("report").innerHTML = BitacoraRender.render(model);
+      bindFilters();
+      showNotice(null);
+      if (status) status.textContent = "Datos de monday.com al " + lastFetchedAtHora;
+      var panel = el("pdf-panel");
+      if (panel && !panel.hidden && !busy) renderPanel();
+      var pdfBtn = el("btn-pdf");
+      if (pdfBtn) pdfBtn.hidden = false;
+    } else {
+      showNotice(noticeForCode(err ? err.code : null, err ? err.message : ""));
+      if (lastModel) {
+        el("report").innerHTML = BitacoraRender.render(lastModel);
+        bindFilters();
+        if (status) status.textContent = "Mostrando datos de las " + lastFetchedAtHora + " — no se pudo actualizar";
+      }
+    }
+
+    lastLoadTime = Date.now();
+    if (btn) btn.disabled = false;
+  }
+
+  /* ---- Inventory filters (screen only; state survives a refresh re-render) ---- */
+  var filterState = { area: "", etapa: "", tipo: "", q: "" };
+  var FILTER_IDS = { area: "f-area", etapa: "f-etapa", tipo: "f-tipo", q: "f-q" };
+
+  function applyFilters() {
+    var q = filterState.q.trim().toLowerCase();
+    var active = !!(filterState.area || filterState.etapa || filterState.tipo || q);
+    var shown = 0;
+    Array.prototype.forEach.call(document.querySelectorAll("#report .inv-section"), function (sec) {
+      var rows = sec.querySelectorAll("tr[data-q]");
+      var vis = 0;
+      Array.prototype.forEach.call(rows, function (tr) {
+        var ok = (!filterState.area || tr.getAttribute("data-areas").indexOf("|" + filterState.area + "|") !== -1) &&
+          (!filterState.etapa || tr.getAttribute("data-etapa") === filterState.etapa) &&
+          (!filterState.tipo || tr.getAttribute("data-tipo") === filterState.tipo) &&
+          (!q || tr.getAttribute("data-q").indexOf(q) !== -1);
+        tr.hidden = !ok;
+        if (ok) vis++;
+      });
+      shown += vis;
+      var count = sec.querySelector(".inv-count");
+      if (count) count.textContent = active ? vis + " de " + count.getAttribute("data-full") : count.getAttribute("data-full");
+      sec.hidden = active && vis === 0;
+    });
+    var label = el("inv-shown");
+    if (label) {
+      var total = label.getAttribute("data-total");
+      label.textContent = active ? "Mostrando " + shown + " de " + total : total + " tickets";
+    }
+    var empty = el("inv-empty");
+    if (empty) empty.hidden = !(active && shown === 0);
+  }
+
+  function bindFilters() {
+    Object.keys(FILTER_IDS).forEach(function (key) {
+      var input = el(FILTER_IDS[key]);
+      if (!input) return;
+      if (filterState[key]) {
+        input.value = filterState[key];
+        if (input.value !== filterState[key]) filterState[key] = ""; /* option gone after refresh */
+      }
+      input.addEventListener(key === "q" ? "input" : "change", function () {
+        filterState[key] = input.value;
+        applyFilters();
+      });
+    });
+    applyFilters();
+  }
+
+  /* ---- PDF page breaks ----
+     html2pdf computes its "avoid" breaks inside toContainer(), i.e. at its default ~718px container
+     width, BEFORE we widen that container to PDF_RENDER_WIDTH — so on a multi-page report its spacers
+     land mid-page. Instead, lay the clone out at the final width (the offscreen wrapper) and push any
+     block that would straddle a page boundary to the next page ourselves. Page height in CSS px =
+     render width × printable height / printable width (must match opts.margin and the A4 format),
+     floored the same way toPdf() floors it at scale 2. */
+  var PDF_AVOID = ".kpi-row, .lead-note, .grid-2, .inv-title, table.moves tr, .resumen-hoy";
+  var PDF_MARGIN = { top: 10, left: 10 };            /* mm — must match opts.margin */
+  var PAGE_INNER = { w: 210 - 10 - 10, h: 297 - 10 - 12 };
+
+  /* Page height in CSS px exactly as html2pdf's toPdf() slices the canvas: floor(canvasWidth * h/w) / scale. */
+  function pageHeightPx(width, scale) {
+    var s = scale || 2;
+    return Math.floor(s * width * PAGE_INNER.h / PAGE_INNER.w) / s;
+  }
+
+  /* Rows placed at the top of a new page when a table continues there: "<section> (continuación)"
+     plus a copy of the table header, so the page never starts with bare rows. */
+  function contRows(node) {
+    var table = node.closest("table");
+    if (!table || !table.tHead || !table.tHead.rows.length) return [];
+    var head = table.tHead.rows[0];
+    var doc = node.ownerDocument;
+    var rows = [];
+    if (table.getAttribute("data-cont")) {
+      var tr = doc.createElement("tr");
+      tr.className = "cont-row";
+      var td = doc.createElement("td");
+      td.colSpan = head.children.length;
+      td.textContent = table.getAttribute("data-cont") + " (continuación)";
+      tr.appendChild(td);
+      rows.push(tr);
+    }
+    rows.push(head.cloneNode(true));
+    return rows;
+  }
+
+  function insertPageSpacers(page, width, scale) {
+    var doc = page.ownerDocument;
+    var ph = pageHeightPx(width, scale);
+    var els = page.querySelectorAll(PDF_AVOID);
+    for (var i = 0; i < els.length; i++) {
+      var node = els[i];
+      var top = node.getBoundingClientRect().top - page.getBoundingClientRect().top;
+      var h = node.getBoundingClientRect().height;
+      if (node.classList.contains("inv-title")) {
+        /* keep a section title together with its table header and first row/ticket */
+        var first = node.parentNode.querySelector("table tbody tr");
+        if (first) h = first.getBoundingClientRect().bottom - node.getBoundingClientRect().top;
+      }
+      if (h <= 0 || h >= ph) continue;
+      var pageEnd = (Math.floor(top / ph) + 1) * ph;
+      if (top + h <= pageEnd - 1) continue;
+      var gap = pageEnd - top + 6;
+      if (node.tagName === "TR" || node.tagName === "TBODY") {
+        var inHead = node.parentNode && node.parentNode.tagName === "THEAD";
+        var cols = node.tagName === "TR" ? node.children.length : node.rows[0].children.length;
+        var sp = doc.createElement("tr");
+        var std = doc.createElement("td");
+        std.colSpan = cols || 1;
+        std.style.cssText = "height:" + gap + "px;padding:0;border:none;background:#fff";
+        sp.appendChild(std);
+        var extra = inHead ? [] : contRows(node);
+        if (node.tagName === "TBODY") {
+          var tb = doc.createElement("tbody");
+          tb.appendChild(sp);
+          extra.forEach(function (r) { tb.appendChild(r); });
+          node.parentNode.insertBefore(tb, node);
+        } else {
+          node.parentNode.insertBefore(sp, node);
+          extra.forEach(function (r) { node.parentNode.insertBefore(r, node); });
+        }
+      } else {
+        var div = doc.createElement("div");
+        div.style.height = gap + "px";
+        node.parentNode.insertBefore(div, node);
+      }
+    }
+  }
+
+  /* Running footer on every page: document label + "Página X de Y" (replaces the in-flow footer). */
+  function addPageFooter(pdf, text) {
+    var n = pdf.getNumberOfPages();
+    for (var i = 1; i <= n; i++) {
+      pdf.setPage(i);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(8);
+      pdf.setTextColor(85, 101, 110);
+      pdf.text(pdf.splitTextToSize(text, 150)[0], PDF_MARGIN.left, 291);
+      pdf.text("Página " + i + " de " + n, 210 - PDF_MARGIN.left, 291, { align: "right" });
+    }
+  }
+
+  function escHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function noticeForPdfError(e) {
+    var code = e && e.code;
+    if (code === "declined") return null;
+    if (code === "rate_limited") return NOTICE.PDF_BUSY;
+    if (code === "rejected_extension" || code === "extension_not_enabled" || code === "unavailable" ||
+        code === "not_granted" || code === "capability_disabled" || code === "capability_removed") {
+      return NOTICE.PDF_UNAVAILABLE;
+    }
+    return NOTICE.PDF_OTHER;
+  }
+
+  /* Rasterize one report page (the on-screen .page or a detached one) into a PDF blob. */
+  async function pdfBlobFrom(pageNode, renderWidth, footerText) {
+    var PDF_RENDER_WIDTH = renderWidth || 900;
+    var wrapper = document.createElement("div");
+    wrapper.style.position = "fixed";
+    wrapper.style.left = "-10000px";
+    wrapper.style.top = "0";
+    wrapper.style.width = PDF_RENDER_WIDTH + "px";
+    var clone = pageNode.cloneNode(true);
+    clone.classList.add("pdf-desktop");
+    /* The PDF always carries the full inventory, whatever filters are active on screen. */
+    var fbar = clone.querySelector("#inv-filters");
+    if (fbar) fbar.parentNode.removeChild(fbar);
+    Array.prototype.forEach.call(clone.querySelectorAll("tr[data-q], .inv-section"), function (n) { n.hidden = false; });
+    var emptyNote = clone.querySelector("#inv-empty");
+    if (emptyNote) emptyNote.hidden = true;
+    Array.prototype.forEach.call(clone.querySelectorAll(".inv-count"), function (c) { c.textContent = c.getAttribute("data-full"); });
+    var inflowFooter = clone.querySelector("footer"); /* moved to the running page footer */
+    if (inflowFooter) inflowFooter.parentNode.removeChild(inflowFooter);
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    var root = document.documentElement;
+    var hadAttr = root.hasAttribute("data-theme");
+    var prevTheme = root.getAttribute("data-theme");
+    root.setAttribute("data-theme", "light");
+
+    try {
+      var opts = {
+        margin: [10, 10, 12, 10],
+        image: { type: "jpeg", quality: 0.95 },
+        html2canvas: {
+          scale: 2, backgroundColor: "#ffffff", logging: false,
+          /* ≥1024 so html2canvas' internal window never triggers the phone layout (max-width: 760px);
+             the container itself is PDF_RENDER_WIDTH wide and pinned at x = 0. */
+          windowWidth: Math.max(PDF_RENDER_WIDTH, 1024), x: 0, y: 0, scrollX: 0, scrollY: 0,
+        },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        /* page breaks are placed by insertPageSpacers() — html2pdf's own avoid pass runs at the
+           narrower pre-widening layout and would drop its spacers in the wrong places */
+        pagebreak: { mode: ["css"], avoid: [] },
+      };
+      /* html2pdf 0.10.3's own toContainer() ignores html2canvas.windowWidth/opt.width entirely and
+         always sizes its internal capture container to the PDF page's printable width (~718px for
+         A4 portrait with these margins) — far narrower than this 980px-max-width report. Content
+         that can't reflow below that (the KPI row, the wide tables) silently overflows past the
+         container's right edge and gets cropped out of the canvas instead of being scaled down.
+         Drive the pipeline manually so we can widen that container to match PDF_RENDER_WIDTH
+         (same value as html2canvas.windowWidth and the offscreen wrapper above) right after it's
+         created, before anything is rasterized. toPdf() still scales the resulting canvas down to
+         the page's printable width, so the visual output/margins are unaffected. */
+      return await global
+        .html2pdf()
+        .set(opts)
+        .from(clone)
+        .toContainer()
+        .then(function () {
+          /* html2pdf centers its container (left:0; right:0; margin:auto). On a viewport wider than
+             PDF_RENDER_WIDTH that puts it at x = (viewport − width) / 2, but html2canvas renders the
+             clone in a PDF_RENDER_WIDTH-wide window where it sits at x = 0 — the crop rectangle ends
+             up shifted, cutting the left of the report and leaving the right half of the page blank.
+             Pin the container to the left edge so both coordinate systems agree. */
+          var c = this.prop.container.style;
+          c.width = PDF_RENDER_WIDTH + "px";
+          c.left = "0";
+          c.right = "auto";
+          c.margin = "0";
+          /* Page breaks are computed on html2pdf's container — the DOM it rasterizes.
+             The clone carries .pdf-desktop (app.css) so the phone layout never applies here either, which keeps
+             this layout identical to html2canvas' own >=1024px window. Browsers cap canvas height (~32k px),
+             so very long files get a lower scale; the page height is derived from the scale actually used. */
+          var cont = this.prop.container;
+          var scale = Math.min(2, Math.floor((30000 / (cont.getBoundingClientRect().height * 1.4)) * 100) / 100);
+          this.opt.html2canvas.scale = scale;
+          insertPageSpacers(cont, PDF_RENDER_WIDTH, scale);
+          return this.toCanvas();
+        })
+        .then(function () {
+          return this.toPdf();
+        })
+        .then(function () {
+          if (footerText) addPageFooter(this.prop.pdf, footerText);
+        })
+        .then(function () {
+          return this.outputPdf("blob");
+        });
+    } finally {
+      if (hadAttr) {
+        root.setAttribute("data-theme", prevTheme);
+      } else {
+        root.removeAttribute("data-theme");
+      }
+      document.body.removeChild(wrapper);
+    }
+  }
+
+  /* One save prompt at a time: a back-to-back save can hit rate_limited while the previous
+     prompt is closing — wait once and retry. */
+  async function saveBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function slug(s) {
+    return String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "area";
+  }
+
+  function areaFilename(areas) {
+    var part = areas.length <= 3 ? areas.map(slug).join("_") : areas.length + "-areas";
+    return "Incidencias-Mejoras-GoLive-" + part + "-" + lastModel.fechaISO + ".pdf";
+  }
+
+  /* Per-area review form: the report data mapped onto the master template's config (the template
+     itself holds no area-specific data). */
+  function configRevision(model, opts) {
+    var contacto = BitacoraRender.analista;
+    var tickets = [];
+    model.inventario.forEach(function (sec) {
+      sec.filas.forEach(function (r) {
+        tickets.push({
+          id: r.code,
+          url: r.url,
+          descripcion: r.descCompleta || r.desc,
+          relaciones: r.rel ? r.rel.split(/\s*\|\s*/).filter(Boolean) : [],
+          clasificacion: r.gl === "Sin clasificar" ? null : r.gl,
+          severidad: r.sev === "—" ? null : r.sev,
+          espera: r.dias,
+          estado: r.etapa === "Sin etapa" ? null : r.etapa,
+          tipo: r.tipo,
+          reabierto: !!r.reab
+        });
+      });
+    });
+    return {
+      sistema: "Cosmos Connect",
+      etapaProyecto: "Go Live",
+      area: BitacoraRender.nombreAreas(model.areasSel || []),
+      fechaEmision: model.fechaISO,
+      datosActualizados: model.actualizadoISO,
+      fechaLimite: opts.fechaLimite || null,
+      gerenciaResponsable: opts.gerencia || null,
+      destinatario: { nombre: contacto.nombre, correo: contacto.correo },
+      periodicidad: opts.frecuencia || null,
+      tablero: { nombre: model.tablero.nombreOriginal || model.tablero.nombre, url: model.tablero.url },
+      tickets: tickets
+    };
+  }
+
+  var busy = false;
+
+  /* opts: {modo: "general"} or {modo: "area", areas: [...], porArea: bool} */
+  async function exportarPdf(opts) {
+    opts = opts || { modo: "general" };
+    if (busy) return;
+    if (opts.modo === "area" ? !(global.jspdf && global.PDFLib && global.BitacoraPlantilla) : !global.html2pdf) {
+      showNotice(NOTICE.PDF_LOAD);
+      return;
+    }
+    if (!dl) {
+      showNotice(NOTICE.PDF_UNAVAILABLE);
+      return;
+    }
+    if (!lastModel || !lastRaw) return;
+    if (opts.modo === "area" && !(opts.areas && opts.areas.length)) return;
+
+    busy = true;
+    var btn = el("btn-pdf");
+    var prevText = btn ? btn.textContent : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Generando PDF…";
+    }
+    updatePanelState();
+    var status = el("status");
+    var prevStatus = status ? status.textContent : "";
+
+    try {
+      if (opts.modo === "area") {
+        var grupos = opts.porArea ? opts.areas.map(function (a) { return [a]; }) : [opts.areas];
+        for (var i = 0; i < grupos.length; i++) {
+          if (status) {
+            status.textContent = "Generando PDF " + (grupos.length > 1 ? (i + 1) + " de " + grupos.length + " " : "") +
+              "(" + grupos[i].join(", ") + ")…";
+          }
+          var model = BitacoraEngine.compute(lastRaw, { areas: grupos[i] });
+          var hecho = await BitacoraPlantilla.generar(configRevision(model, {
+            fechaLimite: opts.fechaLimite, frecuencia: opts.frecuencia,
+            gerencia: (opts.gerencias || {})[claveGerencia(grupos[i])] || null
+          }));
+          await saveBlob(hecho.blob, areaFilename(grupos[i]));
+        }
+      } else {
+        if (status) status.textContent = "Generando PDF…";
+        var original = document.querySelector("#report .page");
+        if (!original) return;
+        var blob = await pdfBlobFrom(original, 900,
+          "Cosmos Connect · Incidencias & Mejoras — Inventario Go Live · Actualizado " + lastModel.actualizado);
+        await saveBlob(blob, "Incidencias-Mejoras-GoLive-" + lastModel.fechaISO + ".pdf");
+      }
+      closePanel();
+    } catch (e) {
+      /* "declined" stops the remaining per-area files silently */
+      var msg = noticeForPdfError(e);
+      if (msg) showNotice(msg);
+    } finally {
+      busy = false;
+      if (status) status.textContent = prevStatus;
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = prevText;
+      }
+      updatePanelState();
+    }
+  }
+
+  /* ---- PDF options panel: General vs Por área ---- */
+  var pdfSel = { modo: "general", areas: [], porArea: true, fechaLimite: "", frecuencia: "cada semana", gerencias: leerGerencias() };
+
+  /* "Gerencia Responsable" is typed per area (or per combined file) before downloading and remembered
+     in this browser so it doesn't have to be retyped next time. */
+  var GERENCIAS_KEY = "incidencias-golive:gerencias";
+
+  function leerGerencias() {
+    try { return JSON.parse(global.localStorage.getItem(GERENCIAS_KEY) || "{}") || {}; } catch (e) { return {}; }
+  }
+
+  function guardarGerencias() {
+    try { global.localStorage.setItem(GERENCIAS_KEY, JSON.stringify(pdfSel.gerencias)); } catch (e) { /* storage unavailable */ }
+  }
+
+  function claveGerencia(areas) { return areas.join(" + "); }
+
+  function destinosGerencia() {
+    if (!pdfSel.areas.length) return [];
+    return pdfSel.porArea ? pdfSel.areas.map(function (x) { return [x]; }) : [pdfSel.areas.slice()];
+  }
+
+  var gerFirma = null;
+
+  function renderGerencias() {
+    var cont = el("pdf-ger");
+    if (!cont) return;
+    var destinos = destinosGerencia();
+    var firma = destinos.map(claveGerencia).join("|");
+    if (firma === gerFirma) return;             // same targets: keep the inputs (and the caret) as they are
+    gerFirma = firma;
+    cont.hidden = !destinos.length;
+    cont.innerHTML = destinos.map(function (d, i) {
+      var clave = claveGerencia(d);
+      var etiqueta = destinos.length > 1 || d.length > 1 ? "Gerencia Responsable (" + escHtml(clave) + ")" : "Gerencia Responsable";
+      return '<label>' + etiqueta + ' <input type="text" data-clave="' + escHtml(clave) + '" id="pdf-ger-' + i +
+        '" value="' + escHtml(pdfSel.gerencias[clave] || "") + '" placeholder="Escriba la gerencia"></label>';
+    }).join("") + '<span class="pdf-hint">Sin gerencia, el PDF sale marcado como borrador.</span>';
+    Array.prototype.forEach.call(cont.querySelectorAll("input[data-clave]"), function (inp) {
+      inp.addEventListener("input", function () {
+        pdfSel.gerencias[inp.getAttribute("data-clave")] = inp.value.trim();
+        guardarGerencias();
+      });
+    });
+  }
+
+  function areaCounts() {
+    var counts = {};
+    lastModel.inventario.forEach(function (s) {
+      s.filas.forEach(function (r) {
+        r.areas.forEach(function (a) { counts[a] = (counts[a] || 0) + 1; });
+      });
+    });
+    return counts;
+  }
+
+  function renderPanel() {
+    var p = el("pdf-panel");
+    if (!p || !lastModel) return;
+    gerFirma = null;
+    var areas = lastModel.filtros.areas;
+    var counts = areaCounts();
+    pdfSel.areas = pdfSel.areas.filter(function (a) { return areas.indexOf(a) !== -1; });
+    var general = pdfSel.modo === "general";
+    p.innerHTML =
+      '<div class="pdf-modes">' +
+      '<label><input type="radio" name="pdf-modo" value="general"' + (general ? " checked" : "") + "> <b>General</b>" +
+      '<span class="pdf-hint">— el reporte completo, como se ve ahora</span></label>' +
+      '<label><input type="radio" name="pdf-modo" value="area"' + (general ? "" : " checked") + "> <b>Por área</b>" +
+      '<span class="pdf-hint">— formulario de revisión para cada área, rellenable en el PDF</span></label>' +
+      "</div>" +
+      '<div class="pdf-areas' + (general ? " disabled" : "") + '" id="pdf-areas">' +
+      areas.map(function (a) {
+        return '<label><input type="checkbox" value="' + escHtml(a) + '"' +
+          (pdfSel.areas.indexOf(a) !== -1 ? " checked" : "") + (general ? " disabled" : "") + "> " + escHtml(a) +
+          ' <span class="area-n">' + (counts[a] || 0) + "</span></label>";
+      }).join("") +
+      "</div>" +
+      (general ? "" :
+        '<div class="pdf-extra">' +
+        '<label>Fecha límite de respuesta <input type="date" id="pdf-fecha" value="' + escHtml(pdfSel.fechaLimite) + '"></label>' +
+        '<span class="pdf-hint" id="pdf-fecha-nota"' + (pdfSel.fechaLimite ? " hidden" : "") + '>Sin fecha, el PDF sale marcado como borrador.</span>' +
+        '<label>Avance a las áreas <select id="pdf-frec">' +
+        ["cada semana", "cada dos semanas"].map(function (f) {
+          return '<option value="' + f + '"' + (pdfSel.frecuencia === f ? " selected" : "") + ">" + f + "</option>";
+        }).join("") + "</select></label>" +
+        "</div>" +
+        '<div class="pdf-extra pdf-ger" id="pdf-ger" hidden></div>' +
+        '<div class="pdf-msg" id="pdf-msg-wrap"><div class="pdf-msg-head"><span>Mensaje sugerido para enviar con el PDF</span>' +
+        '<button type="button" id="pdf-copy">Copiar</button></div><textarea id="pdf-msg" spellcheck="false"></textarea></div>') +
+      '<div class="pdf-row">' +
+      '<span class="links" id="pdf-links"><button type="button" id="pdf-all">Marcar todas</button> · ' +
+      '<button type="button" id="pdf-none">Ninguna</button></span>' +
+      '<label id="pdf-per-wrap"><input type="checkbox" id="pdf-per"' + (pdfSel.porArea ? " checked" : "") +
+      "> Un archivo por área</label>" +
+      '<span class="pdf-actions"><button type="button" id="pdf-cancel">Cancelar</button>' +
+      '<button type="button" class="primary" id="pdf-go">Descargar</button></span>' +
+      "</div>";
+
+    Array.prototype.forEach.call(p.querySelectorAll('input[name="pdf-modo"]'), function (r) {
+      r.addEventListener("change", function () {
+        pdfSel.modo = r.value;
+        renderPanel();
+      });
+    });
+    Array.prototype.forEach.call(p.querySelectorAll("#pdf-areas input"), function (c) {
+      c.addEventListener("change", function () {
+        pdfSel.areas = Array.prototype.filter.call(p.querySelectorAll("#pdf-areas input"), function (x) {
+          return x.checked;
+        }).map(function (x) { return x.value; });
+        updatePanelState();
+      });
+    });
+    el("pdf-all").addEventListener("click", function () { pdfSel.areas = areas.slice(); renderPanel(); });
+    el("pdf-none").addEventListener("click", function () { pdfSel.areas = []; renderPanel(); });
+    el("pdf-per").addEventListener("change", function () { pdfSel.porArea = el("pdf-per").checked; updatePanelState(); });
+    el("pdf-cancel").addEventListener("click", closePanel);
+    if (!general) {
+      el("pdf-fecha").addEventListener("change", function () {
+        pdfSel.fechaLimite = el("pdf-fecha").value;
+        el("pdf-fecha-nota").hidden = !!pdfSel.fechaLimite;
+        updatePanelState();
+      });
+      el("pdf-frec").addEventListener("change", function () { pdfSel.frecuencia = el("pdf-frec").value; });
+      el("pdf-copy").addEventListener("click", copiarMensaje);
+    }
+    el("pdf-go").addEventListener("click", function () {
+      exportarPdf({ modo: pdfSel.modo, areas: pdfSel.areas.slice(), porArea: pdfSel.porArea,
+        fechaLimite: pdfSel.fechaLimite || null, frecuencia: pdfSel.frecuencia,
+        gerencias: JSON.parse(JSON.stringify(pdfSel.gerencias)) });
+    });
+    updatePanelState();
+  }
+
+  function updatePanelState() {
+    var go = el("pdf-go");
+    if (!go) return;
+    var general = pdfSel.modo === "general";
+    var n = pdfSel.areas.length;
+    go.disabled = busy || (!general && n === 0);
+    go.textContent = busy ? "Generando…" : (!general && n > 1 && pdfSel.porArea ? "Descargar " + n + " PDF" : "Descargar");
+    el("pdf-per-wrap").hidden = general || n < 2;
+    el("pdf-links").hidden = general;
+    if (!general) renderGerencias();
+    var msg = el("pdf-msg");
+    if (msg) {
+      el("pdf-msg-wrap").hidden = n === 0;
+      msg.value = n ? mensajes() : "";
+    }
+  }
+
+  /* One message per area (or one for the combined file), same wording as the PDF's letter. */
+  function mensajes() {
+    var grupos = pdfSel.porArea ? pdfSel.areas.map(function (a) { return [a]; }) : [pdfSel.areas];
+    return grupos.map(function (g) {
+      var m = BitacoraEngine.compute(lastRaw, { areas: g });
+      var txt = BitacoraRender.mensajeArea(m, { fechaLimite: pdfSel.fechaLimite || null });
+      return grupos.length > 1 ? "——— " + g.join(", ") + " ———\n" + txt : txt;
+    }).join("\n\n");
+  }
+
+  function copiarMensaje() {
+    var msg = el("pdf-msg");
+    var btn = el("pdf-copy");
+    function done(ok) {
+      btn.textContent = ok ? "Copiado ✓" : "Selecciónalo y cópialo";
+      setTimeout(function () { btn.textContent = "Copiar"; }, 2500);
+    }
+    msg.focus();
+    msg.select();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg.value).then(function () { done(true); }, function () {
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        done(ok);
+      });
+    } else {
+      var ok2 = false;
+      try { ok2 = document.execCommand("copy"); } catch (e) { ok2 = false; }
+      done(ok2);
+    }
+  }
+
+  function closePanel() {
+    var p = el("pdf-panel");
+    if (p) p.hidden = true;
+  }
+
+  function togglePanel() {
+    var p = el("pdf-panel");
+    if (!p) return;
+    if (p.hidden) {
+      renderPanel();
+      p.hidden = false;
+    } else {
+      closePanel();
+    }
+  }
+
+  async function boot() {
+    var refreshBtn = el("btn-refresh");
+    if (refreshBtn) refreshBtn.addEventListener("click", function () { load({ refresh: true }); });
+    var pdfBtn = el("btn-pdf");
+    if (pdfBtn) pdfBtn.addEventListener("click", togglePanel);
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "visible" && Date.now() - lastLoadTime > 15 * 60 * 1000) {
+        load({ refresh: false });
+      }
+    });
+
+    await load({ refresh: false });
+  }
+
+  global.BitacoraApp = {
+    load: load,
+    exportarPdf: exportarPdf,
+    getModel: function () {
+      return lastModel;
+    },
+  };
+
+  if (typeof document !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", boot);
+    } else {
+      boot();
+    }
+  }
+})(typeof window !== "undefined" ? window : this);
+
+</script>
+
+</body></html>
