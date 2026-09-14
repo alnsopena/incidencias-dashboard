@@ -15,7 +15,7 @@ const BOARD = 18429643827;
 const COLS = [
   "color_mm654b11", "dropdown_mm38x45a", "color_mm08qtw9",
   "date_mm0dgr9k", "date_mm151q1k", "date_mm0dfxgk", "date_mm0d57hz", "date_mm1q65r7",
-  "text_mm6w60e0", "color_mm73ye9b"
+  "text_mm6w60e0", "color_mm73ye9b", "color_mm73myee"
 ];
 
 async function mondayQuery(query, variables) {

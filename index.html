@@ -550,6 +550,9 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
 
   function relOf(it) { return cv(it, "text_mm6w60e0"); }
   function tipoOf(it) {
+    var t = cv(it, "color_mm73myee");
+    if (t === "Mejora" || t === "Incidencia") return t;
+    // Sin valor en la columna Tipo: se usa el grupo del tablero como respaldo.
     var g = it.group || {};
     if (g.id === "group_mm6618d8" || /mejora/i.test(g.title || "")) return "Mejora";
     return "Incidencia";
@@ -1275,7 +1278,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
       '<div class="panel"><h3>Por área <span class="n">— por atender</span></h3>' + legend(withNone) + areasHtml + "</div>" +
       '<div class="panel"><h3>Antigüedad <span class="n">— días desde la fecha de reporte</span></h3>' + legend(withNone) +
       model.antiguedad.map(function (r) { return compactRow(r.label, r); }).join("") +
-      '<h3 class="sub-h">Por tipo <span class="n">— grupos del tablero</span></h3>' +
+      '<h3 class="sub-h">Por tipo <span class="n">— columna Tipo</span></h3>' +
       model.tipos.map(function (r) { return compactRow(r.label, r); }).join("") +
       "</div>" +
       "</div>" +
