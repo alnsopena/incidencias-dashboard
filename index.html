@@ -481,15 +481,21 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
     return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
   }
 
-  function codeOf(name, id) {
+  /* ID shown for a ticket: the board's "ID Defecto" column (item-id column with a custom key such as
+     "I-001") when it has a value; otherwise the code in brackets in the name ("[H-020] ..."); otherwise
+     "#" + the last 5 digits of the monday item id. The bracket code is stripped from the description and,
+     when "ID Defecto" is used, kept as `ref` (shown as "Código de origen"). A plain long number in
+     "ID Defecto" (the column's default pulse-id display) is treated as no value. */
+  function codeOf(name, id, idDefecto) {
+    var bracket = null;
     var m = String(name).match(/\[([^\[\]]+)\]/);
-    if (m) {
-      var content = m[1].trim();
-      if (CODE_RE.test(content)) return { code: content, bracketContent: content };
-    }
+    if (m && CODE_RE.test(m[1].trim())) bracket = m[1].trim();
+    var custom = idDefecto != null ? String(idDefecto).trim() : "";
+    if (custom && !/^\d{6,}$/.test(custom)) return { code: custom, bracketContent: bracket, ref: bracket };
+    if (bracket) return { code: bracket, bracketContent: bracket, ref: null };
     var idStr = String(id);
     var last5 = idStr.length > 5 ? idStr.slice(-5) : idStr;
-    return { code: "#" + last5, bracketContent: null };
+    return { code: "#" + last5, bracketContent: null, ref: null };
   }
 
   function cleanTitle(name, codeBracketContent, sinCortar) {
@@ -547,6 +553,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
   function cierreOf(it) { return cv(it, "date_mm0d57hz"); }
   function reaperturaOf(it) { return cv(it, "date_mm1q65r7"); }
   function etapaOf(it) { return cv(it, "color_mm73ye9b"); }
+  function idDefectoOf(it) { return cv(it, "pulse_id_mm088y91"); }
 
   function relOf(it) { return cv(it, "text_mm6w60e0"); }
   function tipoOf(it) {
@@ -670,11 +677,12 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
 
   function invRow(e, hoy) {
     var it = e.it;
-    var ci = codeOf(it.name, it.id);
+    var ci = codeOf(it.name, it.id, idDefectoOf(it));
     var rep = reporteOf(it);
     return {
       code: ci.code, url: it.url, desc: cleanTitle(it.name, ci.bracketContent),
       descCompleta: cleanTitle(it.name, ci.bracketContent, true),
+      ref: ci.ref,
       rel: relOf(it) ? collapseSpaces(relOf(it)) : null,
       tipo: e.tipo, area: e.area || "Sin área", areas: areaTokens(e.area), sev: e.sev || "—", etapa: e.stage,
       reab: e.reab,
@@ -689,7 +697,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
       if (s) return s;
       var da = a.dias == null ? -1 : a.dias, db = b.dias == null ? -1 : b.dias;
       if (da !== db) return db - da;
-      return a.code < b.code ? -1 : (a.code > b.code ? 1 : 0);
+      return String(a.code).localeCompare(String(b.code), "es", { numeric: true });
     });
     return rows;
   }
@@ -909,7 +917,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
         }
       }
 
-      var ci = codeOf(it.name, it.id);
+      var ci = codeOf(it.name, it.id, idDefectoOf(it));
       movRaw.push({
         tipo: tipo, code: ci.code, url: it.url, hora: hora, ms: ms,
         desc: cleanTitle(it.name, ci.bracketContent),
@@ -943,7 +951,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
     var resumenHoy = clauses.length ? ("Hoy: " + clauses.join(", ") + ".") : "Sin movimientos hoy.";
 
     var cerrados = enriched.filter(function (e) { return e.stage === "Cerrado" && !e.dl; }).map(function (e) {
-      var ci = codeOf(e.it.name, e.it.id);
+      var ci = codeOf(e.it.name, e.it.id, idDefectoOf(e.it));
       return { code: ci.code, url: e.it.url, desc: cleanTitle(e.it.name, ci.bracketContent), cierre: cierreOf(e.it) };
     });
     cerrados.sort(function (a, b) { return (b.cierre || "") < (a.cierre || "") ? -1 : ((b.cierre || "") > (a.cierre || "") ? 1 : 0); });
@@ -1097,11 +1105,12 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
 
   /* ---- General report inventory ---- */
   function invRow(r, conGl) {
-    var q = (r.code + " " + r.desc + " " + (r.rel || "")).toLowerCase();
+    var q = (r.code + " " + (r.ref || "") + " " + r.desc + " " + (r.rel || "")).toLowerCase();
     return (
       '<tr data-areas="|' + esc(r.areas.join("|")) + '|" data-etapa="' + esc(r.etapa) + '" data-tipo="' + esc(r.tipo) + '" data-q="' + esc(q) + '">' +
       '<td class="id-cell">' + idLink(r.code, r.url) + "</td>" +
-      "<td>" + esc(r.desc) + (r.rel ? '<span class="rel">' + esc(r.rel) + "</span>" : "") + "</td>" +
+      "<td>" + esc(r.desc) + (r.ref ? '<span class="rel">Código de origen: ' + esc(r.ref) + "</span>" : "") +
+      (r.rel ? '<span class="rel">' + esc(r.rel) + "</span>" : "") + "</td>" +
       "<td>" + esc(r.tipo) + "</td>" +
       "<td>" + esc(r.area) + "</td>" +
       '<td><span class="tag sev-' + esc(r.sev) + '">' + esc(r.sev) + "</span>" +
@@ -1442,7 +1451,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
         if (s) return s;
         var ea = a.espera == null ? -1 : a.espera, eb = b.espera == null ? -1 : b.espera;
         if (ea !== eb) return eb - ea;
-        return String(a.id) < String(b.id) ? -1 : (String(a.id) > String(b.id) ? 1 : 0);
+        return String(a.id).localeCompare(String(b.id), "es", { numeric: true });
       });
     }
     var pruebas = tickets.filter(function (t) { return t.estado === ESTADO_PRUEBAS; });
@@ -2466,7 +2475,7 @@ tr.cont-row td { padding: 4px 9px 6px !important; border: none !important; backg
           id: r.code,
           url: r.url,
           descripcion: r.descCompleta || r.desc,
-          relaciones: r.rel ? r.rel.split(/\s*\|\s*/).filter(Boolean) : [],
+          relaciones: (r.ref ? ["Código de origen: " + r.ref] : []).concat(r.rel ? r.rel.split(/\s*\|\s*/).filter(Boolean) : []),
           clasificacion: r.gl === "Sin clasificar" ? null : r.gl,
           severidad: r.sev === "—" ? null : r.sev,
           espera: r.dias,
